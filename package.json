@@ -4,20 +4,70 @@
   "description": "蓝源卫士 vscode 插件",
   "version": "0.0.1",
   "engines": {
-    "vscode": "^1.87.0"
+    "vscode": "^1.57.0"
   },
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
   "main": "./out/extension.js",
+  "activationEvents": [
+    "onView:blueOrigin_guardian_explorer"
+  ],
   "contributes": {
-    "commands": [
-      {
-        "command": "vscode-extension-blueorigin-guardian.helloWorld",
-        "title": "Hello World"
+    "commands": [{
+      "command": "vscode-extension-blueorigin-guardian.helloWorld",
+      "title": "Hello World",
+      "category": "blueorigin"
+    }],
+    "viewsContainers": {
+      "activitybar": [{
+        "id": "blueOriginGuardian",
+        "title": "蓝源卫士",
+        "icon": "resources/blueOriginGuardian_white.svg"
+      }]
+    },
+    "views": {
+      "explorer": [{
+        "id": "blueOrigin_guardian_currentFile",
+        "name": "蓝源卫士：当前文件情况"
+      }],
+      "blueOriginGuardian": [{
+        "id": "blueOrigin_guardian_explorer",
+        "name": "蓝源卫士：文件列表"
+      }]
+    },
+    "configuration": {
+      "title": "蓝源卫士",
+      "type": "object",
+      "properties": {
+        "blueOriginGuardian.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "是否启用蓝源卫士",
+          "scope": "application"
+        },
+        "blueOriginGuardian.serverAddr": {
+          "type": "string",
+          "default": "http://192.168.0.37:8081",
+          "format": "url",
+          "description": "蓝源卫士服务器地址",
+          "scope": "application"
+        },
+        "blueOriginGuardian.login": {
+          "type": "string",
+          "default": "admin@localhost.com",
+          "description": "蓝源卫士服务账户",
+          "scope": "application"
+        },
+        "blueOriginGuardian.password": {
+          "type": "string",
+          "format": "password",
+          "default": "adminblue",
+          "description": "蓝源卫士服务器密码",
+          "scope": "application"
+        }
       }
-    ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "pnpm run compile",
@@ -28,14 +78,19 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.87.0",
+    "@types/lodash": "^4.17.0",
     "@types/mocha": "^10.0.6",
     "@types/node": "18.x",
+    "@types/vscode": "^1.87.0",
     "@typescript-eslint/eslint-plugin": "^7.0.2",
     "@typescript-eslint/parser": "^7.0.2",
-    "eslint": "^8.56.0",
-    "typescript": "^5.3.3",
     "@vscode/test-cli": "^0.0.6",
-    "@vscode/test-electron": "^2.3.9"
+    "@vscode/test-electron": "^2.3.9",
+    "eslint": "^8.56.0",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "axios": "^1.6.8",
+    "lodash": "^4.17.21"
   }
 }
