@@ -8,7 +8,7 @@ import { assign } from "lodash";
 const reqBlue = new class {
   private readonly config = vscode.workspace.getConfiguration('blueOriginGuardian');
   private readonly baseServer: ReturnType<typeof axios.create>;
-  private readonly baseUrl = this.config.get('baseUrl') + '';
+  private readonly baseUrl = this.config.get('serverAddr') + '';
   private readonly user = this.config.get('login') + '';
   private readonly password = this.config.get('password') + '';
   private token: string = "";
