@@ -7,32 +7,30 @@ import { assign } from "lodash";
  */
 const reqBlue = new class {
   private readonly config = vscode.workspace.getConfiguration('blueOriginGuardian');
-  private readonly baseServer: ReturnType<typeof axios.create>;
   private readonly baseUrl = this.config.get('serverAddr') + '';
   private readonly user = this.config.get('login') + '';
   private readonly password = this.config.get('password') + '';
   private token: string = "";
-
-  constructor() {
-    this.baseServer = axios.create({
-      baseURL: this.baseUrl,
-    });
-  }
+  private readonly baseServer = axios.create({
+    baseURL: this.baseUrl,
+  });
 
   /**
    * 通用请求方法
    * @param url
    * @param data 
-   * @returns 
+   * @returns
    */
   async postData(url: string, data: any = {}) {
+    await this.login();
     const basePayload = {
       user: this.user,
       token: this.token,
     };
-    await this.login();
     try {
-      return await this.baseServer.post(url, assign(basePayload, data));
+      const payload = assign(basePayload, data);
+      const result = await this.baseServer.post(url, payload);
+      return result;
     } catch (error) {
       console.error(error);
       return Promise.reject(error);
@@ -65,8 +63,12 @@ const reqBlue = new class {
    * 登出
    */
   private async logout() {
+    const payload = {
+      user: this.user,
+      token: this.token,
+    };
     try {
-      await this.baseServer.post('/local2/logout');
+      await this.baseServer.post('/local2/logout', payload);
       // 登出成功后的处理逻辑
       console.log("登出成功", this.token);
       this.token = '';
