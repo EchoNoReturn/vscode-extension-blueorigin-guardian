@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
-import { CurrentFileTreeDataProvider } from './providers/CurrentFile';
+import reqBlue from './requests/BlueBaseServer';
+import { viewManager } from './ViewManager';
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -7,20 +8,15 @@ export function activate(context: vscode.ExtensionContext) {
 	console.log('Congratulations, your extension "vscode-extension-blueorigin-guardian" is now active!');
 
 	let disposable = vscode.commands.registerCommand('vscode-extension-blueorigin-guardian.helloWorld', () => {
-		const configs = vscode.workspace.getConfiguration('blueOriginGuardian');
-		console.log(configs, configs.get('enable'));
+		const res = reqBlue.postData("/local2/getfiletree");
+		console.log(res);
 		vscode.window.showInformationMessage('Hello World from vscode-extension-blueorigin-guardian!');
 	});
 
-	vscode.window.createTreeView('blueOrigin_guardian_currentFile', {
-		treeDataProvider: new CurrentFileTreeDataProvider(),
-	})
+	viewManager.init();
 
 	context.subscriptions.push(
 		disposable,
-		vscode.commands.registerCommand('extension.activate', () => {
-			vscode.workspace.getConfiguration().get('blueOriginGuardian.enable');
-		})
 	);
 }
 

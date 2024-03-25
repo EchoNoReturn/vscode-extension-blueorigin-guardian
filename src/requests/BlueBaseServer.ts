@@ -80,6 +80,3 @@ const reqBlue = new class {
 };
 
 export default reqBlue;
-
-
-
