@@ -1,5 +1,9 @@
 import * as vscode from 'vscode';
-export interface ExplorerNode {
+
+/**
+ * 目录节点
+ */
+export interface ExplorerNode extends vscode.TreeItem {
   repos: string;
   children?: ExplorerNode[];
   // 可以添加更多属性，比如id、图标等  

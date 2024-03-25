@@ -5,7 +5,7 @@ import { ExplorerNode, Three } from '../types/CurrentFileType'
 
 
 // 实现 TreeDataProvider  
-export class ExplorerTreeDataProvider implements vscode.TreeDataProvider<ExplorerNode> {
+export class CurrentFileTreeDataProvider implements vscode.TreeDataProvider<ExplorerNode> {
   // 初始化数据，这里仅作为示例  
   private _onDidChangeTreeData: vscode.EventEmitter<ExplorerNode | undefined | null | void> = new vscode.EventEmitter<ExplorerNode | undefined | null | void>();
   readonly onDidChangeTreeData: vscode.Event<ExplorerNode | undefined | null | void> = this._onDidChangeTreeData.event;
@@ -59,7 +59,7 @@ export class ExplorerTreeDataProvider implements vscode.TreeDataProvider<Explore
     this._onDidChangeTreeData.fire();
   }
 
-  updata(editor: vscode.TextEditor) {
+  update(editor: vscode.TextEditor) {
     this.isloading = true;
     this.refresh()
     // 拿到文件路径
@@ -100,20 +100,4 @@ export class ExplorerTreeDataProvider implements vscode.TreeDataProvider<Explore
     const data = getfileHandle(res.data)
     this.list = data
   }
-}
-
-export function activate(context: vscode.ExtensionContext) {
-
-  // 创建TreeDataProvider实例  
-  const treeDataProvider = new ExplorerTreeDataProvider();
-  // 注册TreeDataProvider到"myExplorerViewId"视图  
-  vscode.window.registerTreeDataProvider('myExplorerViewId', treeDataProvider);
-
-  // 刷新视图（可选，如果你需要立即更新视图）  
-  treeDataProvider.refresh();
-
-}
-
-export function deactivate() {
-  // 清理资源（可选）  
 }

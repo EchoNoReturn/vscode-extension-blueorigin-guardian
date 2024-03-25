@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import { ExplorerTreeDataProvider } from './providers/CurrentFile';
-import { log } from 'console';
+import reqBlue from './requests/BlueBaseServer';
+import { viewManager } from './ViewManager';
 import { fullItem } from './types/CurrentFileType';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -18,29 +18,20 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// TODO 待摘除
 	let disposable = vscode.commands.registerCommand('vscode-extension-blueorigin-guardian.helloWorld', () => {
-		const configs = vscode.workspace.getConfiguration('blueOriginGuardian');
+		const res = reqBlue.postData("/local2/getfiletree");
+		console.log(res);
 		vscode.window.showInformationMessage('Hello World from vscode-extension-blueorigin-guardian!');
 	});
 
-	const currentFileTreeDataProvider = new ExplorerTreeDataProvider();
-	vscode.window.createTreeView('blueOrigin_guardian_currentFile', {
-		treeDataProvider: currentFileTreeDataProvider,
-		showCollapseAll: true,
-	})
+	viewManager.init();
 
 	const updateCurrentFileView = (editor: vscode.TextEditor | undefined) => {
 		if (!editor) return
-		currentFileTreeDataProvider.updata(editor)
+		viewManager.updateCurrentFileView(editor)
 	}
 	updateCurrentFileView(vscode.window.activeTextEditor)
 	context.subscriptions.push(
 		disposable,
-		vscode.window.onDidChangeActiveTextEditor(updateCurrentFileView),
-
-		vscode.commands.registerCommand('extension.activate', () => {
-			vscode.workspace.getConfiguration().get('blueOriginGuardian.enable');
-
-		})
 	);
 }
 

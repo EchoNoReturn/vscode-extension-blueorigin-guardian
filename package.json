@@ -29,11 +29,21 @@
     "views": {
       "explorer": [{
         "id": "blueOrigin_guardian_currentFile",
-        "name": "蓝源卫士：当前文件情况"
+        "name": "蓝源卫士：当前文件情况",
+        "type": "tree"
       }],
       "blueOriginGuardian": [{
-        "id": "blueOrigin_guardian_explorer",
-        "name": "蓝源卫士：文件列表"
+        "id": "blueOrigin_guardian_details",
+        "name": "详情"
+      }, {
+        "id": "blueOrigin_guardian_vulnerabilities",
+        "name": "所有漏洞"
+      }, {
+        "id": "blueOrigin_guardian_components",
+        "name": "所有组件"
+      }, {
+        "id": "blueOrigin_guardian_licenses",
+        "name": "所有许可证"
       }]
     },
     "configuration": {
