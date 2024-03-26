@@ -11,41 +11,91 @@
   ],
   "main": "./out/extension.js",
   "activationEvents": [
-    "onView:blueOrigin_guardian_explorer"
+    "onView:blueOrigin_guardian_explorer",
+    "onCommand:vscode-extension-blueorigin-guardian.runScanner"
   ],
   "contributes": {
-    "commands": [{
-      "command": "vscode-extension-blueorigin-guardian.helloWorld",
-      "title": "Hello World",
-      "category": "blueorigin"
-    }],
+    "commands": [
+      {
+        "command": "vscode-extension-blueorigin-guardian.helloWorld",
+        "title": "Hello World",
+        "category": "blueorigin"
+      },
+      {
+        "command": "vscode-extension-blueorigin-guardian.runScanner",
+        "title": "扫描当前项目",
+        "category": "blueorigin"
+      },
+      {
+        "command": "vscode-extension-blueorigin-guardian.reScan",
+        "title": "重新扫描",
+        "category": "blueorigin"
+      },
+      {
+        "command": "vscode-extension-blueorigin-guardian.openScanResult",
+        "title": "打开扫描结果",
+        "category": "blueorigin"
+      }
+    ],
     "viewsContainers": {
-      "activitybar": [{
-        "id": "blueOriginGuardian",
-        "title": "蓝源卫士",
-        "icon": "resources/blueOriginGuardian_white.svg"
-      }]
+      "activitybar": [
+        {
+          "id": "blueOriginGuardian",
+          "title": "蓝源卫士",
+          "icon": "resources/blueOriginGuardian_white.svg"
+        }
+      ]
     },
     "views": {
-      "explorer": [{
-        "id": "blueOrigin_guardian_currentFile",
-        "name": "蓝源卫士：当前文件情况",
-        "type": "tree"
-      }],
-      "blueOriginGuardian": [{
-        "id": "blueOrigin_guardian_details",
-        "name": "详情"
-      }, {
-        "id": "blueOrigin_guardian_vulnerabilities",
-        "name": "所有漏洞"
-      }, {
-        "id": "blueOrigin_guardian_components",
-        "name": "所有组件"
-      }, {
-        "id": "blueOrigin_guardian_licenses",
-        "name": "所有许可证"
-      }]
+      "explorer": [
+        {
+          "id": "blueOrigin_guardian_currentFile",
+          "name": "蓝源卫士：当前文件情况",
+          "type": "tree"
+        }
+      ],
+      "blueOriginGuardian": [
+        {
+          "id": "blueOrigin_guardian_details",
+          "name": "详情"
+        },
+        {
+          "id": "blueOrigin_guardian_vulnerabilities",
+          "name": "所有漏洞"
+        },
+        {
+          "id": "blueOrigin_guardian_components",
+          "name": "所有组件"
+        },
+        {
+          "id": "blueOrigin_guardian_licenses",
+          "name": "所有许可证"
+        }
+      ]
     },
+    "menus": {
+      "editor/context": [
+        {
+          "submenu": "blueOriginGuardian"
+        }
+      ],
+      "blueOriginGuardian": [
+        {
+          "command": "vscode-extension-blueorigin-guardian.runScanner",
+          "group": "navigate"
+        },
+        {
+          "command": "vscode-extension-blueorigin-guardian.reScan",
+          "group": "navigate"
+        }
+      ]
+    },
+    "submenus": [
+      {
+        "id": "blueOriginGuardian",
+        "label": "蓝源卫士"
+      }
+    ],
     "configuration": {
       "title": "蓝源卫士",
       "type": "object",
@@ -75,6 +125,17 @@
           "default": "adminblue",
           "description": "蓝源卫士服务器密码",
           "scope": "application"
+        },
+        "blueOriginGuardian.scope": {
+          "type": "string",
+          "enum": [
+            "both",
+            "foss",
+            "custom"
+          ],
+          "default": "foss",
+          "description": "蓝源卫士扫描范围可选值：both(开源库与私有库联合)、foss(开源库)、custom(私有库)。默认值为 foss",
+          "scope": "application"
         }
       }
     }
@@ -101,6 +162,8 @@
   },
   "dependencies": {
     "axios": "^1.6.8",
+    "compressing": "^1.10.0",
+    "form-data": "^4.0.0",
     "lodash": "^4.17.21"
   }
 }
