@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { viewManager } from './ViewManager';
 import { fullItem } from './types/CurrentFileType';
-import { runScanner } from './commands/scanner';
+import { reScan, runScanner } from './commands/scanner';
 
 export function activate(context: vscode.ExtensionContext) {
 	let disposable2 = vscode.commands.registerCommand('extension.openRepo', (node: fullItem) => {
@@ -23,7 +23,8 @@ export function activate(context: vscode.ExtensionContext) {
 	};
 	updateCurrentFileView(vscode.window.activeTextEditor);
 	context.subscriptions.push(
-		vscode.commands.registerCommand('vscode-extension-blueorigin-guardian.runScanner', runScanner)
+		vscode.commands.registerCommand('vscode-extension-blueorigin-guardian.runScanner', runScanner),
+		vscode.commands.registerCommand('vscode-extension-blueorigin-guardian.reScan', reScan),
 	);
 }
 

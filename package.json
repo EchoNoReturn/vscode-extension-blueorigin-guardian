@@ -30,11 +30,6 @@
         "command": "vscode-extension-blueorigin-guardian.reScan",
         "title": "重新扫描",
         "category": "blueorigin"
-      },
-      {
-        "command": "vscode-extension-blueorigin-guardian.openScanResult",
-        "title": "打开扫描结果",
-        "category": "blueorigin"
       }
     ],
     "viewsContainers": {
