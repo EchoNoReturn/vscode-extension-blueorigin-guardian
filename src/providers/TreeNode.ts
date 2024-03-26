@@ -1,5 +1,7 @@
 import * as vscode from 'vscode';
-
+import { createAllComponentsTreeviewDataProvider } from './ComponentsDataProvider';
+import { CompClass } from "../types/compviews";
+import { LicensesResponse } from '../types/licenses'
 export class TreeNode<T> extends vscode.TreeItem {
   constructor(
     public readonly label: string,
@@ -35,14 +37,51 @@ export function createAllVulnerabilitiesTreeNode() {
  * 所有组件树节点
  * @returns 所有组件的树节点
  */
-export function createAllComponentsTreeNode(){
-  return new TreeNode<any>('所有组件', vscode.TreeItemCollapsibleState.Collapsed, undefined, createIntrinsicTreeNodes(['高危组件', '中危组件', '低危组件', '未定义'], vscode.TreeItemCollapsibleState.Collapsed));
+/**
+   * 获取数据
+   * @returns {Promise<void>}
+   */
+
+export function createAllComponentsTreeNode(comp: CompClass) {
+  /**
+     * 所有组件目录
+     */
+  const baseOnTwoTree = [{
+    label: `片段代码组件(${comp.fragmentData.length})`, collapsibleState: !comp.fragmentData.length ? 0 : 1, children: [{ label: `合规组件(${comp.complianceData.length})`, collapsibleState: !comp.complianceData.length ? 0 : 1, children: comp.complianceData },
+    { label: `不合规组件(${comp.unComplianceData.length})`, collapsibleState: !comp.unComplianceData.length ? 0 : 1, children: comp.unComplianceData },
+    {
+      label: `未定义组件(${comp.undefinedData.length})`, collapsibleState: !comp.undefinedData.length ? 0 : 1,
+      children: comp.undefinedData
+    }]
+  }, {
+    label: `依赖关系组件(${comp.dependencyData.length})`, collapsibleState: !comp.dependencyData.length ? 0 : 1, children: [{ label: `匹配漏洞(${comp.cveData.length})`, collapsibleState: !comp.cveData.length ? 0 : 1, children: comp.cveData },
+    {
+      label: `匹配无漏洞(${comp.unCveData.length})`,
+      collapsibleState: !comp.unCveData.length ? 0 : 1, children: comp.unCveData
+    }
+    ]
+  }];
+  return new TreeNode<any>('所有组件', vscode.TreeItemCollapsibleState.Collapsed, undefined, baseOnTwoTree);
 }
 
 /**
  * 创建许可证视图的所有树节点
  * @returns 所有许可证的树节点
  */
-export function createAllLicensesTreeNode() {
-  return new TreeNode<any>('所有许可证', vscode.TreeItemCollapsibleState.Collapsed, undefined, createIntrinsicTreeNodes(['合规', '部分合规', '不合规', '未定义'], vscode.TreeItemCollapsibleState.Collapsed));
+export function createAllLicensesTreeNode(licenses: LicensesResponse) {
+  /**
+      * 所有许可证目录
+      */
+  const baseOnTwoTree = [
+    { label: `合规(${licenses.compliantLicenses.length})`, collapsibleState: !licenses.compliantLicenses.length ? 0 : 1, children: licenses.compliantLicenses },
+    { label: `不合规(${licenses.unCompliantLicenses.length})`, collapsibleState: !licenses.unCompliantLicenses.length ? 0 : 1, children: licenses.unCompliantLicenses },
+    { label: `未定义(${licenses.undefinedLicenses.length})`, collapsibleState: !licenses.undefinedLicenses.length ? 0 : 1, children: licenses.undefinedLicenses },
+  ]
+
+  /**
+     * 片段代码组件
+     */
+  // baseOnTwoTree[0].children.push(licenses.compliantLicenses);
+
+  return new TreeNode<any>('所有组件', vscode.TreeItemCollapsibleState.Collapsed, undefined, baseOnTwoTree);
 }

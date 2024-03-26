@@ -9,7 +9,7 @@ export class CurrentFileTreeDataProvider implements vscode.TreeDataProvider<Expl
   // 初始化数据，这里仅作为示例  
   private _onDidChangeTreeData: vscode.EventEmitter<ExplorerNode | undefined | null | void> = new vscode.EventEmitter<ExplorerNode | undefined | null | void>();
   readonly onDidChangeTreeData: vscode.Event<ExplorerNode | undefined | null | void> = this._onDidChangeTreeData.event;
-  public list: Three | undefined
+  public currentFileList: Three | undefined
   private isloading: boolean = false;
 
   constructor() {
@@ -23,7 +23,7 @@ export class CurrentFileTreeDataProvider implements vscode.TreeDataProvider<Expl
       // 可以设置其他TreeItem属性，比如iconPath、contextValue等  
       // 2. 设置命令  
       command: {
-        command: 'extension.openRepo', // 使用你注册的命令的标识符  
+        command: 'extension.currentFileData', // 使用你注册的命令的标识符  
         title: 'Open Repo', // 命令的标题，显示在 UI 上（可选）  
         arguments: [element] // 传递给命令的参数，这里传递了当前的 ExplorerNode  
       }
@@ -37,17 +37,17 @@ export class CurrentFileTreeDataProvider implements vscode.TreeDataProvider<Expl
 
     if (element) {
       if (fuzzyMatch(element.repos, '漏洞')) {
-        return Promise.resolve(!this.list?.cveList.length ? [{ repos: 'none' }] : this.list?.cveList);
+        return Promise.resolve(!this.currentFileList?.cveList.length ? [{ repos: 'none' }] : this.currentFileList?.cveList);
       } else if (fuzzyMatch(element.repos, '完全')) {
-        return Promise.resolve(!this.list?.fullList.length ? [{ repos: 'none' }] : this.list?.fullList);
+        return Promise.resolve(!this.currentFileList?.fullList.length ? [{ repos: 'none' }] : this.currentFileList?.fullList);
       } else {
-        return Promise.resolve(!this.list?.partialList.length ? [{ repos: 'none' }] : this.list?.partialList);
+        return Promise.resolve(!this.currentFileList?.partialList.length ? [{ repos: 'none' }] : this.currentFileList?.partialList);
       }
     } else {
-      if (this.list) {
-        return Promise.resolve([{ repos: `匹配漏洞(${this.list?.cveList.length})`, children: this.list?.cveList.length ? [{ repos: '匹配漏洞' }] : undefined },
-        { repos: `完全匹配开源库(${this.list?.fullList.length})`, children: this.list?.fullList.length ? [{ repos: '完全匹配开源库' }] : undefined },
-        { repos: `部分匹配开源库(${this.list?.partialList.length})`, children: this.list?.partialList.length ? [{ repos: '部分匹配开源库' }] : undefined }]);
+      if (this.currentFileList) {
+        return Promise.resolve([{ repos: `匹配漏洞(${this.currentFileList?.cveList.length})`, children: this.currentFileList?.cveList.length ? [{ repos: '匹配漏洞' }] : undefined },
+        { repos: `完全匹配开源库(${this.currentFileList?.fullList.length})`, children: this.currentFileList?.fullList.length ? [{ repos: '完全匹配开源库' }] : undefined },
+        { repos: `部分匹配开源库(${this.currentFileList?.partialList.length})`, children: this.currentFileList?.partialList.length ? [{ repos: '部分匹配开源库' }] : undefined }]);
       } else {
         return Promise.resolve([{ repos: '暂无数据' }])
       }
@@ -98,6 +98,6 @@ export class CurrentFileTreeDataProvider implements vscode.TreeDataProvider<Expl
   async postData() {
     const res = await reqBlue.postData('/local2/getfile', { filename: "kernel/kernel/async.c" })
     const data = getfileHandle(res.data)
-    this.list = data
+    this.currentFileList = data
   }
 }

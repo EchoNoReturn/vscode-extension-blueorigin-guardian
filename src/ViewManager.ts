@@ -2,12 +2,15 @@ import * as vscode from 'vscode';
 import { AllVulnerabilitiesTreeviewDataProvider } from './providers/AllVulTreeviewDataProvider';
 import { CurrentFileTreeDataProvider } from './providers/CurrentFileDataProvider';
 import { ExplorerNode } from './types/CurrentFileType';
-
+import { createAllLicensesTreeNode } from './providers/TreeNode';
+import { CreateAllComponentsTreeviewDataProvider } from './providers/ComponentsDataProvider'
+import { createAllLicensesTreeviewDataProvider } from './providers/LicensesDataProvider'
 export const viewManager = new class {
   /**
    * 当前文件视图数据提供者。单独拿出要做树图更新方法
    */
   private _currentFileTreeDataProvider: CurrentFileTreeDataProvider = new CurrentFileTreeDataProvider();
+  public _createAllComponentsTreeviewDataProvider: CreateAllComponentsTreeviewDataProvider = new CreateAllComponentsTreeviewDataProvider();
 
   /**
    * 所有 TreeView 都在此处注册
@@ -21,7 +24,16 @@ export const viewManager = new class {
     /**
      * 所有漏洞视图数据提供者
      */
-    blueOrigin_guardian_vulnerabilities: new AllVulnerabilitiesTreeviewDataProvider()
+    blueOrigin_guardian_vulnerabilities: new AllVulnerabilitiesTreeviewDataProvider(),
+    /**
+    * 所有组件视图数据提供者
+    */
+    blueOrigin_guardian_components: this._createAllComponentsTreeviewDataProvider,
+    /**
+    * 所有许可证视图数据提供者
+    */
+    blueOrigin_guardian_licenses: new createAllLicensesTreeviewDataProvider()
+
   };
 
   /**
@@ -32,7 +44,12 @@ export const viewManager = new class {
   };
 
   /** 更新树图 */
-  public updateCurrentFileView = (editor: vscode.TextEditor) => this._currentFileTreeDataProvider.update(editor);
+  public updateCurrentFileView = (editor: vscode.TextEditor | undefined) => {
+    if (!editor) return
+    this._currentFileTreeDataProvider.update(editor)
+  };
+
+
 
   /**
    * 初始化视图
