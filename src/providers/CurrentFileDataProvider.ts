@@ -25,6 +25,10 @@ export class CurrentFileTreeDataProvider implements vscode.TreeDataProvider<Tree
   //   });
   // }
 
+  updateUI(): void {
+    this.refresh();
+  }
+
   getTreeItem(element: TreeNode<any>): vscode.TreeItem | Thenable<vscode.TreeItem> {
     return element;
   }

@@ -17,11 +17,6 @@
   "contributes": {
     "commands": [
       {
-        "command": "vscode-extension-blueorigin-guardian.helloWorld",
-        "title": "Hello World",
-        "category": "blueorigin"
-      },
-      {
         "command": "vscode-extension-blueorigin-guardian.runScanner",
         "title": "扫描当前项目",
         "category": "blueorigin"

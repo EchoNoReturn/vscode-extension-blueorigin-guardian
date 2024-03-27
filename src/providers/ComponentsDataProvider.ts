@@ -35,6 +35,11 @@ export class CreateAllComponentsTreeviewDataProvider implements vscode.TreeDataP
     });
   }
 
+  updateUI(): void {
+    // TODO 更新数据并重新加载视图
+    this.refresh();
+  }
+
   getTreeItem(element: TreeNode<any>): vscode.TreeItem | Thenable<vscode.TreeItem> {
     return element;
   }
@@ -44,7 +49,6 @@ export class CreateAllComponentsTreeviewDataProvider implements vscode.TreeDataP
       return [{ label: "正在加载...", collapsibleState: 0, children: [] }];
     }
     return element ? element.children : this.rootNode.children;
-
   }
   /**
    * 视图刷新方法
@@ -52,7 +56,6 @@ export class CreateAllComponentsTreeviewDataProvider implements vscode.TreeDataP
   refresh(): void {
     this.rootNode = createAllComponentsTreeNode(this.componentsList);
     this._onDidChangeTreeData.fire();
-
   }
 
   /**
@@ -141,6 +144,6 @@ export class CreateAllComponentsTreeviewDataProvider implements vscode.TreeDataP
       }
     });
 
-    return { complianceData, unComplianceData, undefinedData, fragmentData, dependencyData, unCveData, cveData }
+    return { complianceData, unComplianceData, undefinedData, fragmentData, dependencyData, unCveData, cveData };
   }
 }

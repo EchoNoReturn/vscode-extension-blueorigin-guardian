@@ -4,7 +4,6 @@ import { LicensesResponse } from '../types/licenses';
 import { CurrentFileResponse } from '../types/currentFileType';
 import { CveSeverity } from '../shared';
 import { CveInfo, VulData } from '../types/cveviews';
-
 export class TreeNode<T> extends vscode.TreeItem {
   constructor(
     public readonly label: string,
@@ -48,9 +47,18 @@ export function createAllVulnerabilitiesTreeNode(cveInfo: Record<CveSeverity, Cv
       return acc + count;
     }, 0);
   };
-  const cveInfoTree = new TreeNode<CveInfo>(`组件漏洞 (${countItParams(cveInfo)})`, vscode.TreeItemCollapsibleState.Collapsed, undefined, createSeverityTreeBaseNode<CveInfo>(cveInfo, 'cve'));
-  const codeVulInfoTree = new TreeNode<VulData>(`代码漏洞 (${countItParams(codeVulInfo)})`, vscode.TreeItemCollapsibleState.Collapsed, undefined, createSeverityTreeBaseNode<VulData>(codeVulInfo, 'cve'));
-  return new TreeNode<CveInfo | VulData>('所有漏洞', vscode.TreeItemCollapsibleState.Collapsed, undefined, [codeVulInfoTree, cveInfoTree]);
+  const { TreeItemCollapsibleState: State } = vscode; // 名字太长了，直接用State代替
+
+  const cveInfoTree = new TreeNode<CveInfo>(`组件漏洞 (${countItParams(cveInfo)})`,
+    State.Collapsed, undefined, createSeverityTreeBaseNode<CveInfo>(cveInfo, 'cve'));
+
+  const codeVulInfoTree = new TreeNode<VulData>(`代码漏洞 (${countItParams(codeVulInfo)})`,
+    State.Collapsed, undefined, createSeverityTreeBaseNode<VulData>(codeVulInfo, 'cve'));
+
+  const rootNode = new TreeNode<CveInfo | VulData>('所有漏洞',
+    State.Collapsed, undefined, [codeVulInfoTree, cveInfoTree]);
+
+  return rootNode;
 }
 
 /**

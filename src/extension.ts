@@ -5,10 +5,12 @@ import { componentsDataCommand } from './commands/componentsDataCommand';
 import { licensesDataCommand } from './commands/licensesDataCommand';
 
 import { DetailWebviewViewProvider } from './providers/DetailsWebviewViewProvider';
-import { runScanner, reScan } from './commands/scanner';
 // 假设的对象类型  
+import { reScan, runScanner } from './commands/scanner';
+import { pollingProjectStatus } from './task/pollingTask';
 
 export function activate(context: vscode.ExtensionContext) {
+	currentFileDataCommand(context);
 
 	/**
 	 * 执行当前文件情况命令
@@ -32,8 +34,11 @@ export function activate(context: vscode.ExtensionContext) {
 		new DetailWebviewViewProvider()
 	);
 
-	const updateCurrentFileView = (editor: vscode.TextEditor | undefined) => {
 
+	viewManager.init();
+
+	const updateCurrentFileView = (editor: vscode.TextEditor | undefined) => {
+		if (!editor) { return; }
 		viewManager.updateCurrentFileView(editor);
 	};
 
@@ -49,6 +54,8 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand('vscode-extension-blueorigin-guardian.runScanner', runScanner),
 		vscode.commands.registerCommand('vscode-extension-blueorigin-guardian.reScan', reScan),
+		vscode.commands.registerCommand('vscode-extension-blueorigin-guardian.startPollingProjectStatus', () => pollingProjectStatus.start()),
+		vscode.commands.registerCommand('vscode-extension-blueorigin-guardian.stopPollingProjectStatus', () => pollingProjectStatus.stop())
 	);
 }
 

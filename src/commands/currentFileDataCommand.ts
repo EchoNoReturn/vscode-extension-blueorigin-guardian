@@ -27,6 +27,11 @@ export const currentFileDataCommand = (context: vscode.ExtensionContext) => {
       <div class="center">漏洞列表</div>
       <div class="cveDiv">${listEmpty(node.cve)}</div>`;
 
+
+    /**
+  * 最终webview html
+  */
+
     /**
      * 刷新webviewhtml
      */

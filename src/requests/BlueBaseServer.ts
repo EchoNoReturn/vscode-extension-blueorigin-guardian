@@ -4,6 +4,7 @@ import { assign } from "lodash";
 import path from 'path';
 import fs from 'fs';
 import FormData from "form-data";
+import { pollingProjectStatus } from "../task/pollingTask";
 
 /**
  * 蓝源卫士服务
@@ -71,6 +72,8 @@ const reqBlue = new class {
         }).then((res) => {
           console.log(res.data);
           vscode.window.showInformationMessage('蓝源卫士：上传成功。扫描中...');
+          // 开启轮询
+          pollingProjectStatus.start();
           fs.rmSync(zipFilePath);
           console.log('文件删除成功！', zipFilePath);
         }).catch(err => {

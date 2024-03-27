@@ -26,6 +26,11 @@ export class createAllLicensesTreeviewDataProvider implements vscode.TreeDataPro
     });
   }
 
+  updateUI(): void {
+    // TODO 更新数据并重新加载视图
+    this.refresh();
+  }
+
   getTreeItem(element: TreeNode<any>): vscode.TreeItem | Thenable<vscode.TreeItem> {
     return element;
   }

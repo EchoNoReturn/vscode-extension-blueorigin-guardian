@@ -20,6 +20,34 @@ export enum CveSeverity {
   LOW = "低危漏洞",
   UNKNOWN = "未定义"
 }
+
+/**
+ * 项目状态
+ */
+export enum ProjectStatus {
+  STARTED = "开始",
+  FINISHED = "完成",
+  ERROR = "错误",
+  PENDING = "等待",
+  UNKNOWN = "未知"
+}
+
+export namespace Project {
+  export function parseStatusString(s: string) {
+    switch (s) {
+      case "started":
+        return ProjectStatus.STARTED;
+      case "finished":
+        return ProjectStatus.FINISHED;
+      case "error":
+        return ProjectStatus.ERROR;
+      case "pending":
+        return ProjectStatus.PENDING;
+      default:
+        return ProjectStatus.UNKNOWN;
+    }
+  }
+}
 export namespace Cve {
   /**
   * 把字符串准尉枚举值
