@@ -1,11 +1,11 @@
 import * as vscode from 'vscode';
 import { viewManager } from './ViewManager';
-import { fullItem } from './types/CurrentFileType';
 import { reScan, runScanner } from './commands/scanner';
 
 export function activate(context: vscode.ExtensionContext) {
-	let disposable2 = vscode.commands.registerCommand('extension.openRepo', (node: fullItem) => {
-		// 这里实现你的命令逻辑  
+	let disposable2 = vscode.commands.registerCommand('extension.openRepo', (node: any) => {
+		// 这里实现你的命令逻辑
+		console.log('点击了', node);
 		if (node.author) {
 			//打印出详细信息
 			console.log('打印出详细信息');

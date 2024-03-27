@@ -4,31 +4,53 @@
 
 /**
  * 组件漏洞类型
- */
-enum CveType {
-  VUL_SNIPPET_CVE = "1.漏洞库片段代码匹配",
-  PKG_DEP_CVE = "2.依赖关系匹配",
-  ANY_SNIPPET_CVE = "3.通用片段代码匹配",
+*/
+export enum CveType {
+  VUL_SNIPPET_CVE = "漏洞库片段代码匹配",
+  PKG_DEP_CVE = "依赖关系匹配",
+  ANY_SNIPPET_CVE = "通用片段代码匹配",
 }
 
-namespace CveType {
+/**
+ * 漏洞严重性
+ */
+export enum CveSeverity {
+  HIGH = "高危漏洞",
+  MEDIUM = "中危漏洞",
+  LOW = "低危漏洞",
+  UNKNOWN = "未定义"
+}
+export namespace Cve {
   /**
-   * 把字符串准尉枚举值
-   */
-  export function parseString(s: string) {
-    switch (s.toUpperCase()) { 
-      case "1.Vulnerability snippet match":
+  * 把字符串准尉枚举值
+  */
+  export function parseTypeString(s: string) {
+    switch (s) {
+      case "vul_snippet_cve":
         return CveType.VUL_SNIPPET_CVE;
-      case "2.Package dependency":
+      case "pkg_dep_cve":
         return CveType.PKG_DEP_CVE;
-      case "3.Generic snippet match":
+      case "any_snippet_cve":
         return CveType.ANY_SNIPPET_CVE;
       default:
         throw new Error("Unknown CveType: " + s);
     }
   }
-}
 
-export default {
-  CveType
-};
+  /**
+   * 漏洞严重性字符串转枚举值
+   * @param s 需要转换的字符串
+   */
+  export function parseSeverityString(s: string) {
+    switch (s.toUpperCase()) {
+      case "HIGH":
+        return CveSeverity.HIGH;
+      case "MEDIUM":
+        return CveSeverity.MEDIUM;
+      case "LOW":
+        return CveSeverity.LOW;
+      default:
+        return CveSeverity.UNKNOWN;
+    }
+  }
+}
