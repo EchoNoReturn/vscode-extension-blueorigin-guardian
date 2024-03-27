@@ -1,6 +1,9 @@
 import axios from "axios";
 import * as vscode from "vscode";
 import { assign } from "lodash";
+import path from 'path';
+import fs from 'fs';
+import FormData from "form-data";
 
 /**
  * 蓝源卫士服务
@@ -34,8 +37,50 @@ const reqBlue = new class {
     } catch (error) {
       console.error(error);
       return Promise.reject(error);
-    } finally {
-      await this.logout();
+    }
+  }
+
+  /**
+   * 上传文件到蓝源卫士，项目名称默认为zip文件的名称
+   * @param zipFilePath zip文件路径
+   */
+  async uploadFile(zipFilePath: string) {
+    await this.login();
+    const projectName = path.basename(zipFilePath, '.zip');
+    const formData = new FormData();
+    formData.append('user', this.user);
+    formData.append('token', this.token);
+    formData.append('projectname', projectName);
+    formData.append('scope', this.config.get('scope'));
+    try {
+      const file = fs.createReadStream(zipFilePath);
+      console.log('file', file);
+      formData.append('file', file, { filename: projectName + '.zip' });
+      console.log("成功获取压缩包流");
+      formData.getLength((err, length) => {
+        if (err) {
+          console.error(err);
+          throw err;
+        }
+        console.log("formData.getLengthSync()", length);
+        this.baseServer.post('/local2/submitproject', formData, {
+          headers: {
+            'Content-Type': formData.getHeaders()['content-type'],
+            'content-length': length
+          }
+        }).then((res) => {
+          console.log(res.data);
+          vscode.window.showInformationMessage('蓝源卫士：上传成功。扫描中...');
+          fs.rmSync(zipFilePath);
+          console.log('文件删除成功！', zipFilePath);
+        }).catch(err => {
+          console.error(err);
+          throw err;
+        });
+      });
+    } catch (error) {
+      console.error(error);
+      throw error;
     }
   }
 

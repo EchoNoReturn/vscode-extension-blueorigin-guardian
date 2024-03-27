@@ -68,4 +68,15 @@ export const viewManager = new class {
     });
     return viewsss
   }
+
+  /**
+   * 更新所有视图
+   */
+  updateAllViews() {
+    Object.keys(this._allTreeViews).forEach(id => {
+      if (this._allTreeViews[id] instanceof CurrentFileTreeDataProvider) {
+        // 更新视图逻辑
+      }
+    });
+  }
 };

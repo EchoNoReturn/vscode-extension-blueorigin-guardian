@@ -2,6 +2,8 @@ import * as vscode from 'vscode';
 import { CompClass } from "../types/compviews";
 import { LicensesResponse } from '../types/licenses';
 import { currentFileResponse } from '../types/CurrentFileType';
+import { CveSeverity } from '../shared';
+import { CveInfo, VulData } from '../types/cveviews';
 
 export class TreeNode<T> extends vscode.TreeItem {
   constructor(
@@ -24,14 +26,31 @@ export function createIntrinsicTreeNodes<T>(names: string[], collapsibleState: v
 }
 
 /**
+ * 遍历数据，创建树节点
+ */
+export function createSeverityTreeBaseNode<T>(info: Record<CveSeverity, T[]>, nameKey: keyof T) {
+  return Object.keys(info).map(key => {
+    // 区分出不同漏洞严重性的树
+    return new TreeNode<T>(`${key} (${info[key as CveSeverity].length})`, vscode.TreeItemCollapsibleState.Collapsed, undefined, info[key as CveSeverity].map(it => {
+      // 便利数据完成叶子节点的创建
+      return new TreeNode<T>(`${it[nameKey]}`, vscode.TreeItemCollapsibleState.None, it);
+    }));
+  });
+}
+
+/**
  * 创建所有漏洞的树节点。包含四个固定节点，所有漏洞数据都展示在子节点下。
  */
-export function createAllVulnerabilitiesTreeNode() {
-  const baseOnTwoTree = createIntrinsicTreeNodes<any>(['代码漏洞', '组件漏洞'], vscode.TreeItemCollapsibleState.Collapsed);
-  baseOnTwoTree.forEach((it) => {
-    it.children.push(...createIntrinsicTreeNodes(['高危漏洞', '中危漏洞', '低危漏洞', '未定义'], vscode.TreeItemCollapsibleState.Collapsed));
-  });
-  return new TreeNode<any>('所有漏洞', vscode.TreeItemCollapsibleState.Collapsed, undefined, baseOnTwoTree);
+export function createAllVulnerabilitiesTreeNode(cveInfo: Record<CveSeverity, CveInfo[]>, codeVulInfo: Record<CveSeverity, VulData[]>) {
+  const countItParams = (data: Record<CveSeverity, any[]>) => {
+    return Object.keys(data).reduce((acc, key) => {
+      const count = data[key as CveSeverity].length;
+      return acc + count;
+    }, 0);
+  };
+  const cveInfoTree = new TreeNode<CveInfo>(`组件漏洞 (${countItParams(cveInfo)})`, vscode.TreeItemCollapsibleState.Collapsed, undefined, createSeverityTreeBaseNode<CveInfo>(cveInfo, 'cve'));
+  const codeVulInfoTree = new TreeNode<VulData>(`代码漏洞 (${countItParams(codeVulInfo)})`, vscode.TreeItemCollapsibleState.Collapsed, undefined, createSeverityTreeBaseNode<VulData>(codeVulInfo, 'cve'));
+  return new TreeNode<CveInfo | VulData>('所有漏洞', vscode.TreeItemCollapsibleState.Collapsed, undefined, [codeVulInfoTree, cveInfoTree]);
 }
 
 /**

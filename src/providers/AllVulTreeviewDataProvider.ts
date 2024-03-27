@@ -1,28 +1,62 @@
 import * as vscode from 'vscode';
 import { createAllVulnerabilitiesTreeNode, TreeNode } from './TreeNode';
 import reqBlue from '../requests/BlueBaseServer';
-import { CveViewResponse } from '../types/cveviews';
+import { CveInfo, CveViewResponse, SimpleCveObject, VulData, VulObject } from '../types/cveviews';
 import { TreeNodeUnionType } from '../types';
+import { getWorkSpaceFolder } from '../commands/scanner';
+import { Cve, CveSeverity, CveType } from '../shared';
 
 export class AllVulnerabilitiesTreeviewDataProvider implements vscode.TreeDataProvider<TreeNode<any>> {
   private _onDidChangeTreeData: vscode.EventEmitter<TreeNodeUnionType> = new vscode.EventEmitter<TreeNodeUnionType>();
   readonly onDidChangeTreeData: vscode.Event<TreeNodeUnionType> = this._onDidChangeTreeData.event;
 
-  private _VUL_SNIPPET_CVE: any[] = [];
-  private rootNode: TreeNode<any> = createAllVulnerabilitiesTreeNode();
+  /**
+   * 根节点
+   */
+  private rootNode: TreeNode<any> = new TreeNode(
+    '数据加载中...',
+    vscode.TreeItemCollapsibleState.None,
+    [], [new TreeNode("加载中...", vscode.TreeItemCollapsibleState.None, [], [])]
+  );
+
+  private cveInfo: Record<CveSeverity, CveInfo[]> = {
+    [CveSeverity.HIGH]: [] as CveInfo[],
+    [CveSeverity.MEDIUM]: [] as CveInfo[],
+    [CveSeverity.LOW]: [] as CveInfo[],
+    [CveSeverity.UNKNOWN]: [] as CveInfo[],
+  };
+  private codeVulInfo: Record<CveSeverity, VulData[]> = {
+    [CveSeverity.HIGH]: [] as VulData[],
+    [CveSeverity.MEDIUM]: [] as VulData[],
+    [CveSeverity.LOW]: [] as VulData[],
+    [CveSeverity.UNKNOWN]: [] as VulData[],
+  };
 
   constructor() {
-    this.postdata().finally(() => { 
+    vscode.commands.registerCommand('blue.clickAllVulTreeItem', this.handleTreeItemClick, this);
+    this.postdataAndUpdateUI().finally(() => { 
       this.refresh();
     });
   }
 
+  /**
+   * 点击TreeNode事件
+   * @param element TreeNode<CveInfo | VulData>
+   */
+  handleTreeItemClick(element: TreeNode<CveInfo | VulData>) {
+    console.log('handleTreeItemClick', element);
+  }
+
   getTreeItem(element: TreeNode<any>): vscode.TreeItem | Thenable<vscode.TreeItem> {
+    element.command = {
+      title: 'handleTreeItemClick',
+      command: 'blue.clickAllVulTreeItem',
+      arguments: [element]
+    };
     return element;
   }
 
   getChildren(element?: TreeNode<any> | undefined): vscode.ProviderResult<TreeNode<any>[]> {
-    console.log('element',element);
     return element ? element.children : this.rootNode.children;
   }
 
@@ -31,25 +65,31 @@ export class AllVulnerabilitiesTreeviewDataProvider implements vscode.TreeDataPr
   }
 
   /**
-   * 获取数据
+   * 获取数据,并刚更新视图
    * @returns {Promise<void>}
    */
-  async postdata() {
-    const activeUri = vscode.window.activeTextEditor?.document.uri;
-    if (!activeUri) {
+  async postdataAndUpdateUI() {
+    const workSpaceFolder = getWorkSpaceFolder();
+    // 以目前活动的文集作为基准定位项目名称，如果没有则获取所有项目的第一个
+    const proj = workSpaceFolder?.name ?? vscode.workspace.workspaceFolders?.[0].name;
+    if (!proj) {
+      vscode.window.showInformationMessage("蓝源卫士：获取当前项工作空间项目信息错误");
       return;
     }
-    const workSpaceFolder = vscode.workspace.getWorkspaceFolder(activeUri);
-    if (!workSpaceFolder) {
-      return;
-    }
-    const proj = workSpaceFolder.name;
     // 使用项目名获取项目所有的漏洞视图
     const res = await reqBlue.postData('/local2/getcveview', { proj });
     if (res.status === 200) {
       this.handleData(res.data);
+      this.rootNode = createAllVulnerabilitiesTreeNode(this.cveInfo, this.codeVulInfo);
+      this.refresh();
     } else {
       console.error(res.data);
+      this.rootNode = new TreeNode(
+        'root',
+        vscode.TreeItemCollapsibleState.None,
+        [], [new TreeNode("暂无数据", vscode.TreeItemCollapsibleState.None, [], [])]
+      );
+      this.refresh();
       vscode.window.showInformationMessage("蓝源卫士：获取漏洞数据异常");
     }
   }
@@ -59,27 +99,40 @@ export class AllVulnerabilitiesTreeviewDataProvider implements vscode.TreeDataPr
    */
   handleData(data: CveViewResponse) {
     console.log('data', data);
-    // 处理数据
-    this.handleAnySnippetCve(data.any_snippet_cve);
-    // 获取到新的数据列表，并更新到私有属性
-
-    // 更新视图
+    Object.keys(data).forEach((key) => {
+      const newKey = key as keyof CveViewResponse;
+      // 对 vul 数据特殊处理
+      if (newKey === 'vul') {
+        this.handleVul(data, data[newKey]);
+        return;
+      }
+      this.handleCveInfo(data[newKey], Cve.parseTypeString(key));
+    });
   }
 
-  handleAnySnippetCve(data: CveViewResponse['any_snippet_cve']) {
-    // 处理数据
-  }
-  handlePkgDepCve() {
-    // 处理依赖关系组件数据
-  }
-  handleVulSnippetCve() {
-    // 处理片段代码漏洞数据
-  }
-  handleVul() {
-    // 处理漏洞数据
+  handleVul(originData: CveViewResponse, data: VulObject) {
+    Object.keys(data).forEach((filePath) => {
+      const vuls = data[filePath];
+      Object.keys(vuls).forEach((cveInfos) => {
+        const vulData = new VulData(filePath, cveInfos, vuls[cveInfos]);
+        const severityStr = originData.vul_snippet_cve[vulData.cve].severity;
+        vulData.severity = Cve.parseSeverityString(severityStr);
+        this.codeVulInfo[vulData.severity].push(vulData);
+      });
+    });
   }
 
-  cveGeneralProcessing() {
-    // 通用漏洞数据处理方法
+  handleCveInfo(data: SimpleCveObject, type: CveType) {
+    Object.keys(data).forEach((key) => {
+      const severity = data[key].severity ?? 'unknown';
+      const cveInfo = new CveInfo(
+        key,
+        type,
+        data[key].proj_files,
+        data[key].projs,
+        Cve.parseSeverityString(severity)
+      );
+      this.cveInfo[cveInfo.severity].push(cveInfo);
+    });
   }
 }

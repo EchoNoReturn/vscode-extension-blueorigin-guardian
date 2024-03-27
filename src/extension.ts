@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import reqBlue from './requests/BlueBaseServer';
 import { viewManager } from './ViewManager';
 import { currentFileDataCommand } from './commands/currentFileDataCommand';
 import { DetailWebviewViewProvider } from './providers/DetailsWebviewViewProvider'
@@ -11,12 +10,9 @@ export function activate(context: vscode.ExtensionContext) {
 	 * 执行当前文件情况命令
 	 */
 	currentFileDataCommand(context)
-	// TODO 待摘除
-	let disposable = vscode.commands.registerCommand('vscode-extension-blueorigin-guardian.helloWorld', () => {
-		const res = reqBlue.postData("/local2/getfiletree");
-		console.log(res);
-		vscode.window.showInformationMessage('Hello World from vscode-extension-blueorigin-guardian!');
-	});
+
+
+
 	viewManager.init();
 	/**
 				* 注册详情webview视图
@@ -31,9 +27,12 @@ export function activate(context: vscode.ExtensionContext) {
 	}
 	updateCurrentFileView(vscode.window.activeTextEditor)
 	context.subscriptions.push(
-		disposable,
+		vscode.commands.registerCommand('vscode-extension-blueorigin-guardian.runScanner', runScanner),
+		vscode.commands.registerCommand('vscode-extension-blueorigin-guardian.reScan', reScan),
 	);
 }
 
 // This method is called when your extension is deactivated
-export function deactivate() { }
+export function deactivate() {
+	// 取消挂载组件时执行的逻辑
+}

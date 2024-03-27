@@ -6,11 +6,11 @@ export const getfileHandle = (data: any) => {
     JSON.parse(data.scan_result),
   );
   //完全匹配开源库
-  const fullList: any = []
+  const fullList: any = [];
   //部分匹配开源库
-  const partialList: any = []
+  const partialList: any = [];
   //漏洞
-  const cveList: any = []
+  const cveList: any = [];
   //完全匹配开源库数据处理
   t[0].full_match.forEach(
     (item: any, index: number) => {
