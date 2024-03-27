@@ -28,6 +28,10 @@ export class createAllLicensesTreeviewDataProvider implements vscode.TreeDataPro
 
   updateUI(): void {
     // TODO 更新数据并重新加载视图
+    Object.keys(this.licensesList).forEach(key => {
+      this.licensesList[key as keyof LicensesResponse] = [];
+    });
+    this.postdata();
     this.refresh();
   }
 

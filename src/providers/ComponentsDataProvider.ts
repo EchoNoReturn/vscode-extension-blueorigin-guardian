@@ -22,6 +22,7 @@ export class CreateAllComponentsTreeviewDataProvider implements vscode.TreeDataP
     cveData: [],
     unCveData: []
   };
+
   /**
    * 设置加载效果
    */
@@ -37,6 +38,10 @@ export class CreateAllComponentsTreeviewDataProvider implements vscode.TreeDataP
 
   updateUI(): void {
     // TODO 更新数据并重新加载视图
+    Object.keys(this.componentsList).forEach(key => {
+      this.componentsList[key as keyof CompClass] = [];
+    });
+    this.postdata();
     this.refresh();
   }
 

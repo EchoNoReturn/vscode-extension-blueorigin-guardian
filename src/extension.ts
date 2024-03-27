@@ -10,7 +10,6 @@ import { reScan, runScanner } from './commands/scanner';
 import { pollingProjectStatus } from './task/pollingTask';
 
 export function activate(context: vscode.ExtensionContext) {
-	currentFileDataCommand(context);
 
 	/**
 	 * 执行当前文件情况命令
@@ -26,13 +25,6 @@ export function activate(context: vscode.ExtensionContext) {
 	licensesDataCommand(context);
 
 
-	viewManager.init();
-	/**
-	 * 注册详情webview视图
-	 */
-	vscode.window.registerWebviewViewProvider("blueOrigin_guardian_details",
-		new DetailWebviewViewProvider()
-	);
 
 
 	viewManager.init();
