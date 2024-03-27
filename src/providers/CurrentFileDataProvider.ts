@@ -1,66 +1,185 @@
 import * as vscode from 'vscode';
+import { CurrentFileTreeNode, TreeNode } from './TreeNode';
 import reqBlue from '../requests/BlueBaseServer';
-import { getfileHandle, fuzzyMatch } from '../utils/CurrentFile';
-import { ExplorerNode, Three } from '../types/CurrentFileType'
-
-
-// 实现 TreeDataProvider  
-export class CurrentFileTreeDataProvider implements vscode.TreeDataProvider<ExplorerNode> {
-  // 初始化数据，这里仅作为示例  
-  private _onDidChangeTreeData: vscode.EventEmitter<ExplorerNode | undefined | null | void> = new vscode.EventEmitter<ExplorerNode | undefined | null | void>();
-  readonly onDidChangeTreeData: vscode.Event<ExplorerNode | undefined | null | void> = this._onDidChangeTreeData.event;
-  public list: Three | undefined
-  private isloading: boolean = false;
-
+import { currentFileResponse, currentFileItem } from '../types/CurrentFileType';
+import { TreeNodeUnionType } from '../types';
+export class CurrentFileTreeDataProvider implements vscode.TreeDataProvider<TreeNode<any>> {
+  static componentsList(arg0: string, componentsList: any) {
+    throw new Error('Method not implemented.');
+  }
+  private _onDidChangeTreeData: vscode.EventEmitter<TreeNodeUnionType> = new vscode.EventEmitter<TreeNodeUnionType>();
+  readonly onDidChangeTreeData: vscode.Event<TreeNodeUnionType> = this._onDidChangeTreeData.event;
+  public currentFileList: currentFileResponse = {
+    cveList: [],
+    fullList: [],
+    partialList: []
+  }
+  public currentFileLoading: boolean = true
+  private _VUL_SNIPPET_CVE: any[] = [];
+  private rootNode: TreeNode<any> = CurrentFileTreeNode(this.currentFileList);
   constructor() {
-    // 可以在这里加载数据，比如从文件系统、数据库等  
+    this.postdata().finally(() => {
+      this.currentFileLoading = false;
+      this.refresh();
+    });
   }
 
-  getTreeItem(element: ExplorerNode): vscode.TreeItem {
-    return {
-      label: element.repos,
-      collapsibleState: element.children ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None,
-      // 可以设置其他TreeItem属性，比如iconPath、contextValue等  
-      // 2. 设置命令  
-      command: {
-        command: 'extension.openRepo', // 使用你注册的命令的标识符  
-        title: 'Open Repo', // 命令的标题，显示在 UI 上（可选）  
-        arguments: [element] // 传递给命令的参数，这里传递了当前的 ExplorerNode  
-      }
-    };
+  getTreeItem(element: TreeNode<any>): vscode.TreeItem | Thenable<vscode.TreeItem> {
+    return element;
   }
 
-  getChildren(element?: ExplorerNode): Thenable<ExplorerNode[]> {
-    if (this.isloading) {
-      return Promise.resolve([{ repos: "正在加载..." }])
+  getChildren(element?: TreeNode<any> | undefined): vscode.ProviderResult<TreeNode<any>[]> {
+    if (this.currentFileLoading) {
+      return [{ label: "正在加载...", collapsibleState: 0, children: [] }]
     }
-
-    if (element) {
-      if (fuzzyMatch(element.repos, '漏洞')) {
-        return Promise.resolve(!this.list?.cveList.length ? [{ repos: 'none' }] : this.list?.cveList);
-      } else if (fuzzyMatch(element.repos, '完全')) {
-        return Promise.resolve(!this.list?.fullList.length ? [{ repos: 'none' }] : this.list?.fullList);
-      } else {
-        return Promise.resolve(!this.list?.partialList.length ? [{ repos: 'none' }] : this.list?.partialList);
-      }
-    } else {
-      if (this.list) {
-        return Promise.resolve([{ repos: `匹配漏洞(${this.list?.cveList.length})`, children: this.list?.cveList.length ? [{ repos: '匹配漏洞' }] : undefined },
-        { repos: `完全匹配开源库(${this.list?.fullList.length})`, children: this.list?.fullList.length ? [{ repos: '完全匹配开源库' }] : undefined },
-        { repos: `部分匹配开源库(${this.list?.partialList.length})`, children: this.list?.partialList.length ? [{ repos: '部分匹配开源库' }] : undefined }]);
-      } else {
-        return Promise.resolve([{ repos: '暂无数据' }])
-      }
-    }
+    return element ? element.children : this.rootNode.children;
 
   }
+
   refresh(): void {
-    // 刷新视图，触发onDidChangeTreeData事件  
+
+    this.rootNode = CurrentFileTreeNode(this.currentFileList)
     this._onDidChangeTreeData.fire();
+
   }
 
+  /**
+   * 获取数据
+   * @returns {Promise<void>}
+   */
+  async postdata() {
+    const activeUri = vscode.window.activeTextEditor?.document.uri;
+    if (!activeUri) {
+      return;
+    }
+    const workSpaceFolder = vscode.workspace.getWorkspaceFolder(activeUri);
+    if (!workSpaceFolder) {
+      return;
+    }
+    // const proj = workSpaceFolder.name;
+
+    /**
+   * 使用项目名获取项目所有的组件视图
+   */
+    const proj = 'kernel'
+    const res = await reqBlue.postData('/local2/getfile', { filename: "kernel/kernel/async.c" })
+    if (res.status === 200) {
+      const data = this.handleData(res.data);
+      this.currentFileList = data
+
+    } else {
+      console.error(res.data);
+      vscode.window.showInformationMessage("蓝源卫士：获取当前文件数据异常");
+    }
+  }
+
+  /**
+   * 处理相应结果
+   */
+  handleData(dataObj: { scan_result: any }) {
+    const t: any = Object.values(
+      JSON.parse(dataObj.scan_result),
+    );
+    //完全匹配开源库
+    const fullList: any = []
+    //部分匹配开源库
+    const partialList: any = []
+    //漏洞
+    const cveList: any = []
+    //完全匹配开源库数据处理
+    t[0].full_match.forEach(
+      (item: any, index: number) => {
+        const it = item;
+        it.label = `${item.author}/${item.artifact}`;
+        it.children = [];
+        it.collapsibleState = 0;
+        it.command = {
+          command: 'extension.currentFileData', // 使用你注册的命令的标识符  
+          title: 'Open Repo', // 命令的标题，显示在 UI 上（可选）  
+          arguments: [it] // 传递给命令的参数，这里传递了当前的 ExplorerNode  
+        }
+        if (it.homepage === 'null') {
+          const abc = it.fpath.split('/');
+          const t1 = abc[0].slice(
+            0,
+            abc[0].lastIndexOf('-'),
+          );
+          const t2 = t1.slice(
+            0,
+            t1.lastIndexOf('-'),
+          );
+          const t3 = t1.slice(
+            t1.lastIndexOf('-') + 1,
+          );
+          it.homepage2 = `https://github.com/${t2}/${t3}`;
+        } else {
+          it.homepage2 = it.homepage;
+        }
+
+        it.repos = `${item.author}/${item.artifact}`;
+        it.score = `${item.score}`;
+        it.key = item.artifact + index;
+        it.full = 'full (100%)';
+        it.hits2 = item.hits.slice(
+          0,
+          item.hits.indexOf(','),
+        );
+        fullList.push(it);
+        //漏洞不为空，添加漏洞
+        if (it.cve !== '') {
+          cveList.push(it)
+        }
+      },
+    );
+    //部分匹配开源库数据处理
+    t[0].snippet_match.forEach(
+      (item: any, index: number) => {
+        const it = item;
+        it.label = `${item.author}/${item.artifact}`;
+        it.children = [];
+        it.collapsibleState = 0;
+        it.command = {
+          command: 'extension.currentFileData', // 使用你注册的命令的标识符  
+          title: 'Open Repo', // 命令的标题，显示在 UI 上（可选）  
+          arguments: [it] // 传递给命令的参数，这里传递了当前的 ExplorerNode  
+        }
+        if (it.homepage === 'null') {
+          const abc = it.fpath.split('/');
+          const t1 = abc[0].slice(
+            0,
+            abc[0].lastIndexOf('-'),
+          );
+          const t2 = t1.slice(
+            0,
+            t1.lastIndexOf('-'),
+          );
+          const t3 = t1.slice(
+            t1.lastIndexOf('-') + 1,
+          );
+          it.homepage2 = `https://github.com/${t2}/${t3}`;
+        } else {
+          it.homepage2 = it.homepage;
+        }
+        it.repos = `${item.author}/${item.artifact}`;
+        it.score = `${item.score}`;
+        it.key = item.artifact + index;
+        it.full = 'partial';
+        it.hits2 = item.hits.slice(
+          0,
+          item.hits.indexOf(','),
+        );
+        partialList.push(it);
+        //漏洞不为空，添加漏洞
+        if (it.cve !== '') {
+          cveList.push(it)
+        }
+      },
+    );
+
+    return { fullList, partialList, cveList }
+  }
   update(editor: vscode.TextEditor) {
-    this.isloading = true;
+    this.currentFileLoading = true;
     this.refresh()
     // 拿到文件路径
     const activeFileUri = editor.document.uri;
@@ -88,16 +207,10 @@ export class CurrentFileTreeDataProvider implements vscode.TreeDataProvider<Expl
     }
     console.log('nowwww', now.slice(0, -1))
     // 发起请求
-    this.postData().finally(() => {
-      this.isloading = false;
+    this.postdata().finally(() => {
+      this.currentFileLoading = false;
       this.refresh();
     })
 
-  }
-
-  async postData() {
-    const res = await reqBlue.postData('/local2/getfile', { filename: "kernel/kernel/async.c" })
-    const data = getfileHandle(res.data)
-    this.list = data
   }
 }

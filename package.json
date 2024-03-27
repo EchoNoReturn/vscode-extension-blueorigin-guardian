@@ -17,11 +17,6 @@
   "contributes": {
     "commands": [
       {
-        "command": "vscode-extension-blueorigin-guardian.helloWorld",
-        "title": "Hello World",
-        "category": "blueorigin"
-      },
-      {
         "command": "vscode-extension-blueorigin-guardian.runScanner",
         "title": "扫描当前项目",
         "category": "blueorigin"
@@ -30,7 +25,8 @@
         "command": "vscode-extension-blueorigin-guardian.reScan",
         "title": "重新扫描",
         "category": "blueorigin"
-      }
+        }
+    
     ],
     "viewsContainers": {
       "activitybar": [
@@ -52,7 +48,8 @@
       "blueOriginGuardian": [
         {
           "id": "blueOrigin_guardian_details",
-          "name": "详情"
+          "name": "详情",
+          "type": "webview"
         },
         {
           "id": "blueOrigin_guardian_vulnerabilities",

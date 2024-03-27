@@ -8,12 +8,18 @@ export interface ExplorerNode extends vscode.TreeItem {
   children?: ExplorerNode[];
   // 可以添加更多属性，比如id、图标等  
 }
-export interface Three {
-  cveList: fullItem[],
-  fullList: fullItem[],
-  partialList: fullItem[]
+/**
+ * 当前文件数据分类
+ */
+export interface currentFileResponse {
+  cveList: currentFileItem[],
+  fullList: currentFileItem[],
+  partialList: currentFileItem[]
 }
-export interface fullItem {
+/**
+ * 当前文件子目录节点
+ */
+export interface currentFileItem {
   artifact: string,
   author: string,
   cve: string,
@@ -34,4 +40,7 @@ export interface fullItem {
   score: string,
   source: string,
   version: string
+  label: string,
+  collapsibleState: number,
+  children: []
 }

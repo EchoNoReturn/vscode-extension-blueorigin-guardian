@@ -1,21 +1,20 @@
 import * as vscode from 'vscode';
 import { viewManager } from './ViewManager';
+import { currentFileDataCommand } from './commands/currentFileDataCommand';
+import { DetailWebviewViewProvider } from './providers/DetailsWebviewViewProvider';
+// 假设的对象类型  
 import { reScan, runScanner } from './commands/scanner';
 
 export function activate(context: vscode.ExtensionContext) {
-	let disposable2 = vscode.commands.registerCommand('extension.openRepo', (node: any) => {
-		// 这里实现你的命令逻辑
-		console.log('点击了', node);
-		if (node.author) {
-			//打印出详细信息
-			console.log('打印出详细信息');
-			console.log('click信息', node);
-		}
-	});
-
-	context.subscriptions.push(disposable2);
+	currentFileDataCommand(context);
 
 	viewManager.init();
+	/**
+				* 注册详情webview视图
+				*/
+	vscode.window.registerWebviewViewProvider("blueOrigin_guardian_details",
+		new DetailWebviewViewProvider()
+	);
 
 	const updateCurrentFileView = (editor: vscode.TextEditor | undefined) => {
 		if (!editor) { return; }

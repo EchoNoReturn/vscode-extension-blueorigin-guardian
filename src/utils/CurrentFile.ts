@@ -1,4 +1,6 @@
-//开源库、漏洞数据处理
+/**
+ * 开源库、漏洞数据处理
+ */
 export const getfileHandle = (data: any) => {
   const t: any = Object.values(
     JSON.parse(data.scan_result),
@@ -85,7 +87,9 @@ export const getfileHandle = (data: any) => {
 
   return { fullList, partialList, cveList }
 }
-//字符串模糊匹配
+/**
+ * 字符串模糊匹配
+ */
 export const fuzzyMatch = (str: string, pattern: string) => {
   const regex = new RegExp(pattern, 'i'); // 'i' 表示不区分大小写  
   return regex.test(str);
