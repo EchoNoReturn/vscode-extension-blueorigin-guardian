@@ -11,14 +11,16 @@ export class AllVulnerabilitiesTreeviewDataProvider implements MyTreeDataProvide
   private _onDidChangeTreeData: vscode.EventEmitter<TreeNodeUnionType> = new vscode.EventEmitter<TreeNodeUnionType>();
   readonly onDidChangeTreeData: vscode.Event<TreeNodeUnionType> = this._onDidChangeTreeData.event;
 
+  private _loadingNode = new TreeNode(
+    'rootNode',
+    vscode.TreeItemCollapsibleState.None,
+    [], [new TreeNode("正在加载...", vscode.TreeItemCollapsibleState.None, [], [])]
+  );
+
   /**
    * 根节点
    */
-  private rootNode: TreeNode<any> = new TreeNode(
-    '数据加载中...',
-    vscode.TreeItemCollapsibleState.None,
-    [], [new TreeNode("加载中...", vscode.TreeItemCollapsibleState.None, [], [])]
-  );
+  private rootNode: TreeNode<any> = this._loadingNode;
 
   private cveInfo: Record<CveSeverity, CveInfo[]> = {
     [CveSeverity.HIGH]: [] as CveInfo[],
@@ -44,6 +46,15 @@ export class AllVulnerabilitiesTreeviewDataProvider implements MyTreeDataProvide
    * 重置数据并更新视图
    */
   updateUI(): void {
+    // 数据置空
+    [this.cveInfo, this.codeVulInfo].forEach(obj => {
+      Object.keys(obj).forEach(key => {
+        obj[key as CveSeverity] = [];
+      });
+    });
+    this.rootNode = this._loadingNode;
+    this.refresh();
+    // 更新数据并重绘UI
     this.postdataAndUpdateUI();
   }
 
@@ -95,7 +106,7 @@ export class AllVulnerabilitiesTreeviewDataProvider implements MyTreeDataProvide
       this.rootNode = new TreeNode(
         'root',
         vscode.TreeItemCollapsibleState.None,
-        [], [new TreeNode("暂无数据", vscode.TreeItemCollapsibleState.None, [], [])]
+        undefined, [new TreeNode("暂无数据", vscode.TreeItemCollapsibleState.None)]
       );
       this.refresh();
       vscode.window.showInformationMessage("蓝源卫士：获取漏洞数据异常");

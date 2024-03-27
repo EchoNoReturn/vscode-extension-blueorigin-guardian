@@ -14,7 +14,7 @@ export class CurrentFileTreeDataProvider implements MyTreeDataProvider<TreeNode<
     cveList: [],
     fullList: [],
     partialList: []
-  }
+  };
   public currentFileLoading: boolean = true;
   private rootNode: TreeNode<any> = CurrentFileTreeNode(this.currentFileList);
   constructor() {
@@ -34,7 +34,7 @@ export class CurrentFileTreeDataProvider implements MyTreeDataProvider<TreeNode<
 
   getChildren(element?: TreeNode<any> | undefined): vscode.ProviderResult<TreeNode<any>[]> {
     if (this.currentFileLoading) {
-      return [{ label: "正在加载...", collapsibleState: 0, children: [] }]
+      return [{ label: "正在加载...", collapsibleState: 0, children: [] }];
     }
     return element ? element.children : this.rootNode.children;
 
@@ -42,7 +42,7 @@ export class CurrentFileTreeDataProvider implements MyTreeDataProvider<TreeNode<
 
   refresh(): void {
 
-    this.rootNode = CurrentFileTreeNode(this.currentFileList)
+    this.rootNode = CurrentFileTreeNode(this.currentFileList);
     this._onDidChangeTreeData.fire();
 
   }
@@ -65,11 +65,11 @@ export class CurrentFileTreeDataProvider implements MyTreeDataProvider<TreeNode<
     /**
    * 使用项目名获取项目所有的组件视图
    */
-    const proj = 'kernel'
-    const res = await reqBlue.postData('/local2/getfile', { filename: "kernel/kernel/async.c" })
+    const proj = 'kernel';
+    const res = await reqBlue.postData('/local2/getfile', { filename: "kernel/kernel/async.c" });
     if (res.status === 200) {
       const data = this.handleData(res.data);
-      this.currentFileList = data
+      this.currentFileList = data;
 
     } else {
       console.error(res.data);
@@ -85,11 +85,11 @@ export class CurrentFileTreeDataProvider implements MyTreeDataProvider<TreeNode<
       JSON.parse(dataObj.scan_result),
     );
     //完全匹配开源库
-    const fullList: any = []
+    const fullList: any = [];
     //部分匹配开源库
-    const partialList: any = []
+    const partialList: any = [];
     //漏洞
-    const cveList: any = []
+    const cveList: any = [];
     //完全匹配开源库数据处理
     t[0].full_match.forEach(
       (item: any, index: number) => {
@@ -101,7 +101,7 @@ export class CurrentFileTreeDataProvider implements MyTreeDataProvider<TreeNode<
           command: 'extension.currentFileData', // 使用你注册的命令的标识符  
           title: 'Open Repo', // 命令的标题，显示在 UI 上（可选）  
           arguments: [it] // 传递给命令的参数，这里传递了当前的 ExplorerNode  
-        }
+        };
         if (it.homepage === 'null') {
           const abc = it.fpath.split('/');
           const t1 = abc[0].slice(
@@ -131,7 +131,7 @@ export class CurrentFileTreeDataProvider implements MyTreeDataProvider<TreeNode<
         fullList.push(it);
         //漏洞不为空，添加漏洞
         if (it.cve !== '') {
-          cveList.push(it)
+          cveList.push(it);
         }
       },
     );
@@ -146,7 +146,7 @@ export class CurrentFileTreeDataProvider implements MyTreeDataProvider<TreeNode<
           command: 'extension.currentFileData', // 使用你注册的命令的标识符  
           title: 'Open Repo', // 命令的标题，显示在 UI 上（可选）  
           arguments: [it] // 传递给命令的参数，这里传递了当前的 ExplorerNode  
-        }
+        };
         if (it.homepage === 'null') {
           const abc = it.fpath.split('/');
           const t1 = abc[0].slice(
@@ -175,21 +175,21 @@ export class CurrentFileTreeDataProvider implements MyTreeDataProvider<TreeNode<
         partialList.push(it);
         //漏洞不为空，添加漏洞
         if (it.cve !== '') {
-          cveList.push(it)
+          cveList.push(it);
         }
       },
     );
 
-    return { fullList, partialList, cveList }
+    return { fullList, partialList, cveList };
   }
   update(editor: vscode.TextEditor) {
     this.currentFileLoading = true;
-    this.refresh()
+    this.refresh();
     // 拿到文件路径
     const activeFileUri = editor.document.uri;
     const activeFilePath = activeFileUri.fsPath;
     //获取文件名
-    let folderName = ""
+    let folderName = "";
     const workspaceFolders = vscode.workspace.workspaceFolders;
     if (workspaceFolders) {
       // 遍历每个工作区文件夹  
@@ -202,19 +202,19 @@ export class CurrentFileTreeDataProvider implements MyTreeDataProvider<TreeNode<
     let itemIndex = 0;
     FilePathArr.forEach((item, index) => {
       if (item === folderName) {
-        return itemIndex = index
+        return itemIndex = index;
       }
-    })
-    let now = ""
+    });
+    let now = "";
     for (let i = itemIndex; i < FilePathArr.length; i++) {
-      now += FilePathArr[i] + "/"
+      now += FilePathArr[i] + "/";
     }
-    console.log('nowwww', now.slice(0, -1))
+    console.log('nowwww', now.slice(0, -1));
     // 发起请求
     this.postdata().finally(() => {
       this.currentFileLoading = false;
       this.refresh();
-    })
+    });
 
   }
 }

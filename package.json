@@ -11,8 +11,7 @@
   ],
   "main": "./out/extension.js",
   "activationEvents": [
-    "onView:blueOrigin_guardian_explorer",
-    "onCommand:vscode-extension-blueorigin-guardian.runScanner"
+    "onView:blueOrigin_guardian_explorer"
   ],
   "contributes": {
     "commands": [
@@ -25,8 +24,16 @@
         "command": "vscode-extension-blueorigin-guardian.reScan",
         "title": "重新扫描",
         "category": "blueorigin"
+      },
+      {
+        "command": "vscode-extension-blueorigin-guardian.refresh",
+        "title": "刷新",
+        "category": "blueorigin",
+        "icon": {
+          "light": "resources/refresh_black.svg",
+          "dark": "resources/refresh_white.svg"
         }
-    
+      }
     ],
     "viewsContainers": {
       "activitybar": [
@@ -66,6 +73,13 @@
       ]
     },
     "menus": {
+      "view/title": [
+        {
+          "command": "vscode-extension-blueorigin-guardian.refresh",
+          "group": "navigation",
+          "when": "view == blueOrigin_guardian_details"
+        }
+      ],
       "editor/context": [
         {
           "submenu": "blueOriginGuardian"

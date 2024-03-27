@@ -18,7 +18,8 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand('vscode-extension-blueorigin-guardian.runScanner', runScanner),
 		vscode.commands.registerCommand('vscode-extension-blueorigin-guardian.reScan', reScan),
 		vscode.commands.registerCommand('vscode-extension-blueorigin-guardian.startPollingProjectStatus', () => pollingProjectStatus.start()),
-		vscode.commands.registerCommand('vscode-extension-blueorigin-guardian.stopPollingProjectStatus', () => pollingProjectStatus.stop())
+		vscode.commands.registerCommand('vscode-extension-blueorigin-guardian.stopPollingProjectStatus', () => pollingProjectStatus.stop()),
+		vscode.commands.registerCommand('vscode-extension-blueorigin-guardian.refresh', () => viewManager.updateAllViews())
 	);
 }
 
