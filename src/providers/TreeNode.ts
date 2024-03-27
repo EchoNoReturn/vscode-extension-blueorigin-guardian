@@ -48,9 +48,18 @@ export function createAllVulnerabilitiesTreeNode(cveInfo: Record<CveSeverity, Cv
       return acc + count;
     }, 0);
   };
-  const cveInfoTree = new TreeNode<CveInfo>(`组件漏洞 (${countItParams(cveInfo)})`, vscode.TreeItemCollapsibleState.Collapsed, undefined, createSeverityTreeBaseNode<CveInfo>(cveInfo, 'cve'));
-  const codeVulInfoTree = new TreeNode<VulData>(`代码漏洞 (${countItParams(codeVulInfo)})`, vscode.TreeItemCollapsibleState.Collapsed, undefined, createSeverityTreeBaseNode<VulData>(codeVulInfo, 'cve'));
-  return new TreeNode<CveInfo | VulData>('所有漏洞', vscode.TreeItemCollapsibleState.Collapsed, undefined, [codeVulInfoTree, cveInfoTree]);
+  const { TreeItemCollapsibleState: State } = vscode; // 名字太长了，直接用State代替
+
+  const cveInfoTree = new TreeNode<CveInfo>(`组件漏洞 (${countItParams(cveInfo)})`,
+    State.Collapsed, undefined, createSeverityTreeBaseNode<CveInfo>(cveInfo, 'cve'));
+  
+  const codeVulInfoTree = new TreeNode<VulData>(`代码漏洞 (${countItParams(codeVulInfo)})`,
+    State.Collapsed, undefined, createSeverityTreeBaseNode<VulData>(codeVulInfo, 'cve'));
+  
+  const rootNode = new TreeNode<CveInfo | VulData>('所有漏洞',
+    State.Collapsed, undefined, [codeVulInfoTree, cveInfoTree]);
+  
+  return rootNode;
 }
 
 /**
@@ -111,7 +120,7 @@ export function CurrentFileTreeNode(currentFile: currentFileResponse) {
     { label: `匹配漏洞(${currentFile.cveList.length})`, collapsibleState: !currentFile.cveList.length ? 0 : 1, children: currentFile.cveList },
     { label: `完全匹配开源库(${currentFile.fullList.length})`, collapsibleState: !currentFile.fullList.length ? 0 : 1, children: currentFile.fullList },
     { label: `部分匹配开源库(${currentFile.partialList.length})`, collapsibleState: !currentFile.partialList.length ? 0 : 1, children: currentFile.partialList },
-  ]
+  ];
 
   return new TreeNode<any>('当前', vscode.TreeItemCollapsibleState.Expanded, undefined, baseOnTwoTree);
 }

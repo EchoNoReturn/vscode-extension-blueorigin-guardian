@@ -15,14 +15,17 @@ export class CurrentFileTreeDataProvider implements MyTreeDataProvider<TreeNode<
     fullList: [],
     partialList: []
   }
-  public currentFileLoading: boolean = true
-  private _VUL_SNIPPET_CVE: any[] = [];
+  public currentFileLoading: boolean = true;
   private rootNode: TreeNode<any> = CurrentFileTreeNode(this.currentFileList);
   constructor() {
     this.postdata().finally(() => {
       this.currentFileLoading = false;
       this.refresh();
     });
+  }
+
+  updateUI(): void {
+    this.refresh();
   }
 
   getTreeItem(element: TreeNode<any>): vscode.TreeItem | Thenable<vscode.TreeItem> {

@@ -70,7 +70,7 @@ export const viewManager = new class {
    */
   updateAllViews() {
     Object.keys(this._allTreeViews).forEach(id => {
-      this._allTreeViews[id].refresh();
+      this._allTreeViews[id].updateUI();
     });
   }
 };

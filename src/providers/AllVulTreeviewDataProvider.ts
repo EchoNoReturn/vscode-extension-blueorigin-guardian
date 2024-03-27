@@ -41,6 +41,13 @@ export class AllVulnerabilitiesTreeviewDataProvider implements MyTreeDataProvide
   }
 
   /**
+   * 重置数据并更新视图
+   */
+  updateUI(): void {
+    this.postdataAndUpdateUI();
+  }
+
+  /**
    * 点击TreeNode事件
    * @param element TreeNode<CveInfo | VulData>
    */
