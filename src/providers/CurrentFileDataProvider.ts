@@ -1,9 +1,10 @@
 import * as vscode from 'vscode';
 import { CurrentFileTreeNode, TreeNode } from './TreeNode';
 import reqBlue from '../requests/BlueBaseServer';
-import { currentFileResponse, currentFileItem } from '../types/CurrentFileType';
+import { currentFileResponse } from '../types/CurrentFileType';
 import { TreeNodeUnionType } from '../types';
-export class CurrentFileTreeDataProvider implements vscode.TreeDataProvider<TreeNode<any>> {
+import { MyTreeDataProvider } from './AbstractProvider';
+export class CurrentFileTreeDataProvider implements MyTreeDataProvider<TreeNode<any>> {
   static componentsList(arg0: string, componentsList: any) {
     throw new Error('Method not implemented.');
   }

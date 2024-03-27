@@ -67,23 +67,23 @@ export const currentFileDataCommand = (context: vscode.ExtensionContext) => {
         <meta charset="UTF-8">  
         <meta name="viewport" content="width=device-width, initial-scale=1.0">  
         <title>view</title> 
-         <style>
-            /* 这里添加 CSS 代码 */
-           .filesDiv,.cveDiv{
+        <style>
+          /* 这里添加 CSS 代码 */
+          .filesDiv,.cveDiv{
             height: 100px;
             // line-height: 100px;
             overflow-y: auto;
-           }
-           .center{
-             text-align: center;
-           }
+          }
+          .center{
+            text-align: center;
+          }
           //  a{
           //   text-decoration: none;
           //  }
         </style>
     </head>  
     ${body}
-    </html>`
+    </html>`;
     /**
     * 刷新webviewhtml
     */
@@ -92,4 +92,4 @@ export const currentFileDataCommand = (context: vscode.ExtensionContext) => {
   });
 
   context.subscriptions.push(disposable);
-}
+};

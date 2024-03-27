@@ -3,7 +3,8 @@ import { createAllLicensesTreeNode, TreeNode } from './TreeNode';
 import reqBlue from '../requests/BlueBaseServer';
 import { LicensesResponse, LicensesItem } from '../types/licenses';
 import { TreeNodeUnionType } from '../types';
-export class createAllLicensesTreeviewDataProvider implements vscode.TreeDataProvider<TreeNode<any>> {
+import { MyTreeDataProvider } from './AbstractProvider';
+export class AllLicensesTreeviewDataProvider implements MyTreeDataProvider<TreeNode<any>> {
   static componentsList(arg0: string, componentsList: any) {
     throw new Error('Method not implemented.');
   }
@@ -14,8 +15,8 @@ export class createAllLicensesTreeviewDataProvider implements vscode.TreeDataPro
     compliantLicenses: [],
     unCompliantLicenses: [],
     undefinedLicenses: []
-  }
-  public licensesLoading: boolean = true
+  };
+  public licensesLoading: boolean = true;
   private _VUL_SNIPPET_CVE: any[] = [];
   private rootNode: TreeNode<any> = createAllLicensesTreeNode(this.licensesList);
   constructor() {
@@ -31,7 +32,7 @@ export class createAllLicensesTreeviewDataProvider implements vscode.TreeDataPro
 
   getChildren(element?: TreeNode<any> | undefined): vscode.ProviderResult<TreeNode<any>[]> {
     if (this.licensesLoading) {
-      return [{ label: "正在加载...", collapsibleState: 0, children: [] }]
+      return [{ label: "正在加载...", collapsibleState: 0, children: [] }];
     }
     return element ? element.children : this.rootNode.children;
 
@@ -39,7 +40,7 @@ export class createAllLicensesTreeviewDataProvider implements vscode.TreeDataPro
 
   refresh(): void {
 
-    this.rootNode = createAllLicensesTreeNode(this.licensesList)
+    this.rootNode = createAllLicensesTreeNode(this.licensesList);
     this._onDidChangeTreeData.fire();
 
   }
@@ -57,17 +58,16 @@ export class createAllLicensesTreeviewDataProvider implements vscode.TreeDataPro
     if (!workSpaceFolder) {
       return;
     }
-    // const proj = workSpaceFolder.name;
 
     /**
    * 使用项目名获取项目所有的组件视图
    */
-    const proj = 'kernel'
+    const proj = 'kernel';
     const res = await reqBlue.postData('/local2/getlicenseview', { proj });
     if (res.status === 200) {
       const data = this.handleData(res.data);
-      console.log('data', data)
-      this.licensesList = data
+      console.log('data', data);
+      this.licensesList = data;
 
     } else {
       console.error(res.data);
@@ -91,21 +91,21 @@ export class createAllLicensesTreeviewDataProvider implements vscode.TreeDataPro
       it.label = item;
       it.key = item + index;
       it.compliance = dataObj[item].compliance;
-      it.collapsibleState = 0
+      it.collapsibleState = 0;
       licensesData.push(it);
       it.command = {
         command: 'extension.currentFileData', // 使用你注册的命令的标识符  
         title: 'Open Repo', // 命令的标题，显示在 UI 上（可选）  
         arguments: [it] // 传递给命令的参数，这里传递了当前的 ExplorerNode  
-      }
+      };
       if (it.compliance === "compliant") {
-        compliantLicenses.push(it)
+        compliantLicenses.push(it);
       } else if (it.compliance === "undefined") {
-        undefinedLicenses.push(it)
+        undefinedLicenses.push(it);
       } else {
-        unCompliantLicenses.push(it)
+        unCompliantLicenses.push(it);
       }
     });
-    return { licensesData, compliantLicenses, undefinedLicenses, unCompliantLicenses }
+    return { licensesData, compliantLicenses, undefinedLicenses, unCompliantLicenses };
   }
 }

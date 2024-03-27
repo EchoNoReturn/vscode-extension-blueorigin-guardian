@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import reqBlue from "../requests/BlueBaseServer";
 import { zipDir } from "../utils/compressFiles";
+import { pollingProjectStatus } from "../task/pollingTask";
 
 /**
  * 运行扫描
@@ -62,6 +63,7 @@ export const reScan = async () => {
         console.log("正在扫描中");
         console.log(res.data);
         vscode.window.showInformationMessage("蓝源卫士：正在扫描中...");
+        pollingProjectStatus.start();
       }).catch(err => {
         console.error(err);
         vscode.window.showErrorMessage("蓝源卫士：重新扫描失败");

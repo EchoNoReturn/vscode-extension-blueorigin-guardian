@@ -1,9 +1,10 @@
 import * as vscode from 'vscode';
 import { AllVulnerabilitiesTreeviewDataProvider } from './providers/AllVulTreeviewDataProvider';
 import { CurrentFileTreeDataProvider } from './providers/CurrentFileDataProvider';
-import { ExplorerNode } from './types/CurrentFileType';
 import { CreateAllComponentsTreeviewDataProvider } from './providers/ComponentsDataProvider';
-import { createAllLicensesTreeviewDataProvider } from './providers/LicensesDataProvider';
+import { AllLicensesTreeviewDataProvider } from './providers/LicensesDataProvider';
+import { DetailWebviewViewProvider } from './providers/DetailsWebviewViewProvider';
+import { MyTreeDataProvider } from './providers/AbstractProvider';
 
 export const viewManager = new class {
   /**
@@ -15,7 +16,7 @@ export const viewManager = new class {
   /**
    * 所有 TreeView 都在此处注册
    */
-  private readonly _allTreeViews: { [id: string]: vscode.TreeDataProvider<vscode.TreeItem> | vscode.TreeDataProvider<ExplorerNode> } = {
+  private readonly _allTreeViews: { [id: string]: MyTreeDataProvider<any> } = {
     // 格式为 id : DataProvider
     /**
      * 当前文件视图数据提供者
@@ -32,8 +33,7 @@ export const viewManager = new class {
     /**
     * 所有许可证视图数据提供者
     */
-    blueOrigin_guardian_licenses: new createAllLicensesTreeviewDataProvider(),
-
+    blueOrigin_guardian_licenses: new AllLicensesTreeviewDataProvider(),
   };
 
   /**
@@ -41,23 +41,27 @@ export const viewManager = new class {
    */
   private readonly _allWebViews: { [id: string]: vscode.WebviewViewProvider } = {
     // 格式为 id : WebviewViewProvider
+    blueOrigin_guardian_details: new DetailWebviewViewProvider(),
   };
 
   /** 更新树图 */
   public updateCurrentFileView = (editor: vscode.TextEditor | undefined) => {
-    if (!editor) return
-    this._currentFileTreeDataProvider.update(editor)
+    if (!editor) { return; }
+    this._currentFileTreeDataProvider.update(editor);
   };
 
   /**
    * 初始化视图
    */
   init() {
+    // TreeView 与 WebView 的注册
     Object.keys(this._allTreeViews).forEach(id => {
       vscode.window.createTreeView(id, {
         treeDataProvider: this._allTreeViews[id]
       });
-
+    });
+    Object.keys(this._allWebViews).forEach(id => {
+      vscode.window.registerWebviewViewProvider(id, this._allWebViews[id]);
     });
   }
 
@@ -66,9 +70,7 @@ export const viewManager = new class {
    */
   updateAllViews() {
     Object.keys(this._allTreeViews).forEach(id => {
-      if (this._allTreeViews[id] instanceof CurrentFileTreeDataProvider) {
-        // 更新视图逻辑
-      }
+      this._allTreeViews[id].refresh();
     });
   }
 };

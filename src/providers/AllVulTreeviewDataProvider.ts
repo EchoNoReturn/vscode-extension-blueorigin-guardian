@@ -5,8 +5,9 @@ import { CveInfo, CveViewResponse, SimpleCveObject, VulData, VulObject } from '.
 import { TreeNodeUnionType } from '../types';
 import { getWorkSpaceFolder } from '../commands/scanner';
 import { Cve, CveSeverity, CveType } from '../shared';
+import { MyTreeDataProvider } from './AbstractProvider';
 
-export class AllVulnerabilitiesTreeviewDataProvider implements vscode.TreeDataProvider<TreeNode<any>> {
+export class AllVulnerabilitiesTreeviewDataProvider implements MyTreeDataProvider<TreeNode<any>> {
   private _onDidChangeTreeData: vscode.EventEmitter<TreeNodeUnionType> = new vscode.EventEmitter<TreeNodeUnionType>();
   readonly onDidChangeTreeData: vscode.Event<TreeNodeUnionType> = this._onDidChangeTreeData.event;
 
