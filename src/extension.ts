@@ -1,25 +1,12 @@
 import * as vscode from 'vscode';
 import reqBlue from './requests/BlueBaseServer';
 import { viewManager } from './ViewManager';
-import { currentFileDataCommand } from './commands/currentFileDataCommand'
+import { currentFileDataCommand } from './commands/currentFileDataCommand';
+import { DetailWebviewViewProvider } from './providers/DetailsWebviewViewProvider'
 // 假设的对象类型  
-interface MyObject {
-	id: number;
-	name: string;
-}
 
-// 全局状态键  
-const MY_OBJECT_KEY = 'myObjectKey';
 export function activate(context: vscode.ExtensionContext) {
-	// 注册命令  
-	context.subscriptions.push(vscode.commands.registerCommand('extension.jumpToTargetView', (object: MyObject) => {
-		// 将对象存储到全局状态  
-		vscode.workspace.getConfiguration().update(MY_OBJECT_KEY, object, vscode.ConfigurationTarget.Global);
 
-		// 跳转到目标视图（这里假设只是简单地显示目标视图）  
-		// viewManager.show();
-		// viewManager._createAllComponentsTreeviewDataProvider
-	}));
 	/**
 	 * 执行当前文件情况命令
 	 */
@@ -30,8 +17,13 @@ export function activate(context: vscode.ExtensionContext) {
 		console.log(res);
 		vscode.window.showInformationMessage('Hello World from vscode-extension-blueorigin-guardian!');
 	});
-
 	viewManager.init();
+	/**
+				* 注册详情webview视图
+				*/
+	vscode.window.registerWebviewViewProvider("blueOrigin_guardian_details",
+		new DetailWebviewViewProvider()
+	)
 
 	const updateCurrentFileView = (editor: vscode.TextEditor | undefined) => {
 

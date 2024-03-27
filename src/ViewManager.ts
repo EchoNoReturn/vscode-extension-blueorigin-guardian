@@ -3,8 +3,9 @@ import { AllVulnerabilitiesTreeviewDataProvider } from './providers/AllVulTreevi
 import { CurrentFileTreeDataProvider } from './providers/CurrentFileDataProvider';
 import { ExplorerNode } from './types/CurrentFileType';
 import { createAllLicensesTreeNode } from './providers/TreeNode';
-import { CreateAllComponentsTreeviewDataProvider } from './providers/ComponentsDataProvider'
-import { createAllLicensesTreeviewDataProvider } from './providers/LicensesDataProvider'
+import { CreateAllComponentsTreeviewDataProvider } from './providers/ComponentsDataProvider';
+import { createAllLicensesTreeviewDataProvider } from './providers/LicensesDataProvider';
+
 export const viewManager = new class {
   /**
    * 当前文件视图数据提供者。单独拿出要做树图更新方法
@@ -32,7 +33,7 @@ export const viewManager = new class {
     /**
     * 所有许可证视图数据提供者
     */
-    blueOrigin_guardian_licenses: new createAllLicensesTreeviewDataProvider()
+    blueOrigin_guardian_licenses: new createAllLicensesTreeviewDataProvider(),
 
   };
 
@@ -49,8 +50,6 @@ export const viewManager = new class {
     this._currentFileTreeDataProvider.update(editor)
   };
 
-
-
   /**
    * 初始化视图
    */
@@ -59,6 +58,14 @@ export const viewManager = new class {
       vscode.window.createTreeView(id, {
         treeDataProvider: this._allTreeViews[id]
       });
+
     });
+  }
+  showView(nowId: string) {
+    const viewsss = vscode.window.createTreeView(nowId, {
+      treeDataProvider: this._allTreeViews[nowId],
+      // showCollapseAll: true
+    });
+    return viewsss
   }
 };

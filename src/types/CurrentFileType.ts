@@ -11,15 +11,15 @@ export interface ExplorerNode extends vscode.TreeItem {
 /**
  * 当前文件数据分类
  */
-export interface Three {
-  cveList: fullItem[],
-  fullList: fullItem[],
-  partialList: fullItem[]
+export interface currentFileResponse {
+  cveList: currentFileItem[],
+  fullList: currentFileItem[],
+  partialList: currentFileItem[]
 }
 /**
  * 当前文件子目录节点
  */
-export interface fullItem {
+export interface currentFileItem {
   artifact: string,
   author: string,
   cve: string,
@@ -40,4 +40,7 @@ export interface fullItem {
   score: string,
   source: string,
   version: string
+  label: string,
+  collapsibleState: number,
+  children: []
 }

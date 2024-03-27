@@ -1,13 +1,14 @@
 import * as vscode from 'vscode';
-import { createAllComponentsTreeviewDataProvider } from './ComponentsDataProvider';
 import { CompClass } from "../types/compviews";
-import { LicensesResponse } from '../types/licenses'
+import { LicensesResponse } from '../types/licenses';
+import { currentFileResponse } from '../types/CurrentFileType';
+
 export class TreeNode<T> extends vscode.TreeItem {
   constructor(
     public readonly label: string,
     public readonly collapsibleState: vscode.TreeItemCollapsibleState = vscode.TreeItemCollapsibleState.None,
     public readonly payloadData?: T,
-    public readonly children: TreeNode<T>[] = []
+    public readonly children: TreeNode<T>[] = [],
   ) {
     super(label, collapsibleState);
   }
@@ -77,11 +78,21 @@ export function createAllLicensesTreeNode(licenses: LicensesResponse) {
     { label: `不合规(${licenses.unCompliantLicenses.length})`, collapsibleState: !licenses.unCompliantLicenses.length ? 0 : 1, children: licenses.unCompliantLicenses },
     { label: `未定义(${licenses.undefinedLicenses.length})`, collapsibleState: !licenses.undefinedLicenses.length ? 0 : 1, children: licenses.undefinedLicenses },
   ]
-
+  return new TreeNode<any>('所有组件', vscode.TreeItemCollapsibleState.Expanded, undefined, baseOnTwoTree);
+}
+/**
+ * 创建当前文件视图的所有树节点
+ * @returns 所有当前的树节点
+ */
+export function CurrentFileTreeNode(currentFile: currentFileResponse) {
   /**
-     * 片段代码组件
-     */
-  // baseOnTwoTree[0].children.push(licenses.compliantLicenses);
+      * 当前文件目录
+      */
+  const baseOnTwoTree = [
+    { label: `匹配漏洞(${currentFile.cveList.length})`, collapsibleState: !currentFile.cveList.length ? 0 : 1, children: currentFile.cveList },
+    { label: `完全匹配开源库(${currentFile.fullList.length})`, collapsibleState: !currentFile.fullList.length ? 0 : 1, children: currentFile.fullList },
+    { label: `部分匹配开源库(${currentFile.partialList.length})`, collapsibleState: !currentFile.partialList.length ? 0 : 1, children: currentFile.partialList },
+  ]
 
-  return new TreeNode<any>('所有组件', vscode.TreeItemCollapsibleState.Collapsed, undefined, baseOnTwoTree);
+  return new TreeNode<any>('当前', vscode.TreeItemCollapsibleState.Expanded, undefined, baseOnTwoTree);
 }

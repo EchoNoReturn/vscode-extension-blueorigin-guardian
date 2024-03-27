@@ -14,37 +14,53 @@
     "onView:blueOrigin_guardian_explorer"
   ],
   "contributes": {
-    "commands": [{
-      "command": "vscode-extension-blueorigin-guardian.helloWorld",
-      "title": "Hello World",
-      "category": "blueorigin"
-    }],
+    "commands": [
+      {
+        "command": "vscode-extension-blueorigin-guardian.helloWorld",
+        "title": "Hello World",
+        "category": "blueorigin"
+      }
+    ],
     "viewsContainers": {
-      "activitybar": [{
-        "id": "blueOriginGuardian",
-        "title": "蓝源卫士",
-        "icon": "resources/blueOriginGuardian_white.svg"
-      }]
+      "activitybar": [
+        {
+          "id": "blueOriginGuardian",
+          "title": "蓝源卫士",
+          "icon": "resources/blueOriginGuardian_white.svg"
+        }
+      ]
     },
     "views": {
-      "explorer": [{
-        "id": "blueOrigin_guardian_currentFile",
-        "name": "蓝源卫士：当前文件情况",
-        "type": "tree"
-      }],
-      "blueOriginGuardian": [{
-        "id": "blueOrigin_guardian_details",
-        "name": "详情"
-      }, {
-        "id": "blueOrigin_guardian_vulnerabilities",
-        "name": "所有漏洞"
-      }, {
-        "id": "blueOrigin_guardian_components",
-        "name": "所有组件"
-      }, {
-        "id": "blueOrigin_guardian_licenses",
-        "name": "所有许可证"
-      }]
+      "explorer": [
+        {
+          "id": "blueOrigin_guardian_currentFile",
+          "name": "蓝源卫士：当前文件情况",
+          "type": "tree"
+        }
+      ],
+      "blueOriginGuardian": [
+        {
+          "id": "blueOrigin_guardian_details",
+          "name": "详情",
+          "type": "webview"
+        },
+        {
+          "id": "blueOrigin_guardian_vulnerabilities",
+          "name": "所有漏洞"
+        },
+        {
+          "id": "blueOrigin_guardian_components",
+          "name": "所有组件"
+        },
+        {
+          "id": "blueOrigin_guardian_licenses",
+          "name": "所有许可证"
+        },
+        {
+          "id": "blueOrigin_guardian_test",
+          "name": "测试"
+        }
+      ]
     },
     "configuration": {
       "title": "蓝源卫士",
