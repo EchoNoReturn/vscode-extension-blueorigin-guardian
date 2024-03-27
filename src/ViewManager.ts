@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { AllVulnerabilitiesTreeviewDataProvider } from './providers/AllVulTreeviewDataProvider';
 import { CurrentFileTreeDataProvider } from './providers/CurrentFileDataProvider';
-import { ExplorerNode } from './types/CurrentFileType';
+import { ExplorerNode } from './types/currentFileType';
 import { createAllLicensesTreeNode } from './providers/TreeNode';
 import { CreateAllComponentsTreeviewDataProvider } from './providers/ComponentsDataProvider';
 import { createAllLicensesTreeviewDataProvider } from './providers/LicensesDataProvider';
@@ -46,8 +46,8 @@ export const viewManager = new class {
 
   /** 更新树图 */
   public updateCurrentFileView = (editor: vscode.TextEditor | undefined) => {
-    if (!editor) return
-    this._currentFileTreeDataProvider.update(editor)
+    if (!editor) { return; }
+    this._currentFileTreeDataProvider.update(editor);
   };
 
   /**
@@ -60,13 +60,6 @@ export const viewManager = new class {
       });
 
     });
-  }
-  showView(nowId: string) {
-    const viewsss = vscode.window.createTreeView(nowId, {
-      treeDataProvider: this._allTreeViews[nowId],
-      // showCollapseAll: true
-    });
-    return viewsss
   }
 
   /**

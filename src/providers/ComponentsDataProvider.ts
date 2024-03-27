@@ -3,12 +3,16 @@ import { createAllComponentsTreeNode, TreeNode } from './TreeNode';
 import reqBlue from '../requests/BlueBaseServer';
 import { CompViewResponse, CompItem, CompClass, PkgdepItem } from '../types/compviews';
 import { TreeNodeUnionType } from '../types';
+import { getWorkSpaceFolder } from '../commands/scanner';
 export class CreateAllComponentsTreeviewDataProvider implements vscode.TreeDataProvider<TreeNode<any>> {
   static componentsList(arg0: string, componentsList: any) {
     throw new Error('Method not implemented.');
   }
   private _onDidChangeTreeData: vscode.EventEmitter<TreeNodeUnionType> = new vscode.EventEmitter<TreeNodeUnionType>();
   readonly onDidChangeTreeData: vscode.Event<TreeNodeUnionType> = this._onDidChangeTreeData.event;
+  /**
+   * 传递给树视图的数据
+   */
   public componentsList: CompClass = {
     complianceData: [],
     unComplianceData: [],
@@ -17,8 +21,11 @@ export class CreateAllComponentsTreeviewDataProvider implements vscode.TreeDataP
     dependencyData: [],
     cveData: [],
     unCveData: []
-  }
-  public componentsLoading: boolean = true
+  };
+  /**
+   * 设置加载效果
+   */
+  public componentsLoading: boolean = true;
   private _VUL_SNIPPET_CVE: any[] = [];
   private rootNode: TreeNode<any> = createAllComponentsTreeNode(this.componentsList);
   constructor() {
@@ -34,15 +41,16 @@ export class CreateAllComponentsTreeviewDataProvider implements vscode.TreeDataP
 
   getChildren(element?: TreeNode<any> | undefined): vscode.ProviderResult<TreeNode<any>[]> {
     if (this.componentsLoading) {
-      return [{ label: "正在加载...", collapsibleState: 0, children: [] }]
+      return [{ label: "正在加载...", collapsibleState: 0, children: [] }];
     }
     return element ? element.children : this.rootNode.children;
 
   }
-
+  /**
+   * 视图刷新方法
+   */
   refresh(): void {
-
-    this.rootNode = createAllComponentsTreeNode(this.componentsList)
+    this.rootNode = createAllComponentsTreeNode(this.componentsList);
     this._onDidChangeTreeData.fire();
 
   }
@@ -52,25 +60,19 @@ export class CreateAllComponentsTreeviewDataProvider implements vscode.TreeDataP
    * @returns {Promise<void>}
    */
   async postdata() {
-    const activeUri = vscode.window.activeTextEditor?.document.uri;
-    if (!activeUri) {
-      return;
-    }
-    const workSpaceFolder = vscode.workspace.getWorkspaceFolder(activeUri);
-    if (!workSpaceFolder) {
-      return;
-    }
-    // const proj = workSpaceFolder.name;
+    /**
+     * 获取项目名
+     */
+    const proj = getWorkSpaceFolder()?.name;
 
     /**
-   * 使用项目名获取项目所有的组件视图
-   */
-    const proj = 'kernel'
+     * 使用项目名获取项目所有的组件视图
+     */
+    // const proj = 'kernel';
     const res = await reqBlue.postData('/local2/getcomponentview', { proj });
     if (res.status === 200) {
       const data = this.handleData(res.data);
-      this.componentsList = data
-
+      this.componentsList = data;
     } else {
       console.error(res.data);
       vscode.window.showInformationMessage("蓝源卫士：获取所有组件数据异常");
@@ -81,14 +83,13 @@ export class CreateAllComponentsTreeviewDataProvider implements vscode.TreeDataP
    * 处理相应结果
    */
   handleData(dataObj: CompViewResponse) {
-    // console.log('dataObj', dataObj)
     const fragmentData: CompItem[] = [];
     const complianceData: CompItem[] = [];
     const unComplianceData: CompItem[] = [];
     const undefinedData: CompItem[] = [];
     /**
- * 片段代码组件数据处理
- */
+     * 片段代码组件数据处理
+     */
     Object.keys(dataObj.comp).forEach((item: any, index) => {
       const it = dataObj.comp[item];
       it.label = item;
@@ -97,44 +98,48 @@ export class CreateAllComponentsTreeviewDataProvider implements vscode.TreeDataP
       it.num = `${dataObj.comp[item].proj_files.length}`;
       it.versions = `${dataObj.comp[item].versions.toString()}`;
       it.project = dataObj.comp[item].projs.toString();
-      it.collapsibleState = 0
+      it.collapsibleState = 0;
       it.command = {
-        command: 'extension.currentFileData', // 使用你注册的命令的标识符  
+        command: 'blue.componentsData', // 使用你注册的命令的标识符  
         title: 'Open Repo', // 命令的标题，显示在 UI 上（可选）  
         arguments: [it] // 传递给命令的参数，这里传递了当前的 ExplorerNode  
-      }
+      };
       fragmentData.push(it);
       if (it.compliance === "compliant") {
-        complianceData.push(it)
+        complianceData.push(it);
       } else if (it.compliance === "undefined") {
-        undefinedData.push(it)
+        undefinedData.push(it);
       } else {
-        unComplianceData.push(it)
+        unComplianceData.push(it);
       }
     });
     /**
-    * 依赖关系组件数据处理
-    */
+     * 依赖关系组件数据处理
+     */
+    const proj = getWorkSpaceFolder()?.name;
     const dependencyData: PkgdepItem[] = [];
     const cveData: PkgdepItem[] = [];
     const unCveData: PkgdepItem[] = [];
-    const proj = 'kernel'
-    console.log(Object.keys(dataObj.pkgdep[proj]).forEach((item: any, index) => {
-      const it = dataObj.pkgdep[proj][item];
+    Object.keys(dataObj.pkgdep[proj!]).forEach((item: any, index) => {
+      const it = dataObj.pkgdep[proj!][item];
       it.label = item;
       it.key = item + index;
-      it.cve = dataObj.pkgdep[proj][item].cve;
-      it.pkg_vul = dataObj.pkgdep[proj][item].pkg_vul;
-      it.proj_mainfest = dataObj.pkgdep[proj][item].proj_mainfest;
-      it.provenance = dataObj.pkgdep[proj][item].provenance;
-      it.collapsibleState = 0
+      it.cve = dataObj.pkgdep[proj!][item].cve;
+      it.pkg_vul = dataObj.pkgdep[proj!][item].pkg_vul;
+      it.provenance = dataObj.pkgdep[proj!][item].provenance;
+      it.collapsibleState = 0;
+      it.command = {
+        command: 'blue.componentsData', // 使用你注册的命令的标识符  
+        title: 'Open Repo', // 命令的标题，显示在 UI 上（可选）  
+        arguments: [it] // 传递给命令的参数，这里传递了当前的 ExplorerNode  
+      };
       dependencyData.push(it);
       if (!it.pkg_vul) {
-        unCveData.push(it)
+        unCveData.push(it);
       } else {
-        cveData.push(it)
+        cveData.push(it);
       }
-    }))
+    });
 
     return { complianceData, unComplianceData, undefinedData, fragmentData, dependencyData, unCveData, cveData }
   }

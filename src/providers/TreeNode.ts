@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { CompClass } from "../types/compviews";
 import { LicensesResponse } from '../types/licenses';
-import { currentFileResponse } from '../types/CurrentFileType';
+import { CurrentFileResponse } from '../types/currentFileType';
 import { CveSeverity } from '../shared';
 import { CveInfo, VulData } from '../types/cveviews';
 
@@ -64,8 +64,8 @@ export function createAllVulnerabilitiesTreeNode(cveInfo: Record<CveSeverity, Cv
 
 export function createAllComponentsTreeNode(comp: CompClass) {
   /**
-     * 所有组件目录
-     */
+   * 所有组件目录
+   */
   const baseOnTwoTree = [{
     label: `片段代码组件(${comp.fragmentData.length})`, collapsibleState: !comp.fragmentData.length ? 0 : 1, children: [{ label: `合规组件(${comp.complianceData.length})`, collapsibleState: !comp.complianceData.length ? 0 : 1, children: comp.complianceData },
     { label: `不合规组件(${comp.unComplianceData.length})`, collapsibleState: !comp.unComplianceData.length ? 0 : 1, children: comp.unComplianceData },
@@ -90,28 +90,28 @@ export function createAllComponentsTreeNode(comp: CompClass) {
  */
 export function createAllLicensesTreeNode(licenses: LicensesResponse) {
   /**
-      * 所有许可证目录
-      */
+   * 所有许可证目录
+   */
   const baseOnTwoTree = [
     { label: `合规(${licenses.compliantLicenses.length})`, collapsibleState: !licenses.compliantLicenses.length ? 0 : 1, children: licenses.compliantLicenses },
     { label: `不合规(${licenses.unCompliantLicenses.length})`, collapsibleState: !licenses.unCompliantLicenses.length ? 0 : 1, children: licenses.unCompliantLicenses },
     { label: `未定义(${licenses.undefinedLicenses.length})`, collapsibleState: !licenses.undefinedLicenses.length ? 0 : 1, children: licenses.undefinedLicenses },
-  ]
+  ];
   return new TreeNode<any>('所有组件', vscode.TreeItemCollapsibleState.Expanded, undefined, baseOnTwoTree);
 }
 /**
  * 创建当前文件视图的所有树节点
  * @returns 所有当前的树节点
  */
-export function CurrentFileTreeNode(currentFile: currentFileResponse) {
+export function CurrentFileTreeNode(currentFile: CurrentFileResponse) {
   /**
-      * 当前文件目录
-      */
+   * 当前文件目录
+   */
   const baseOnTwoTree = [
     { label: `匹配漏洞(${currentFile.cveList.length})`, collapsibleState: !currentFile.cveList.length ? 0 : 1, children: currentFile.cveList },
     { label: `完全匹配开源库(${currentFile.fullList.length})`, collapsibleState: !currentFile.fullList.length ? 0 : 1, children: currentFile.fullList },
     { label: `部分匹配开源库(${currentFile.partialList.length})`, collapsibleState: !currentFile.partialList.length ? 0 : 1, children: currentFile.partialList },
-  ]
+  ];
 
   return new TreeNode<any>('当前', vscode.TreeItemCollapsibleState.Expanded, undefined, baseOnTwoTree);
 }
