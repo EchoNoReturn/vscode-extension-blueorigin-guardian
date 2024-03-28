@@ -81,8 +81,9 @@ const reqBlue = new class {
           throw err;
         });
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
+      vscode.window.showErrorMessage('蓝源卫士：', error.response.data.message);
       throw error;
     }
   }

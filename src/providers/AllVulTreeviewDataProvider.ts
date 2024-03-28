@@ -6,6 +6,8 @@ import { TreeNodeUnionType } from '../types';
 import { getWorkSpaceFolder } from '../commands/scanner';
 import { Cve, CveSeverity, CveType } from '../shared';
 import { MyTreeDataProvider } from './AbstractProvider';
+import { DetailWebviewViewProvider } from './DetailsWebviewViewProvider';
+import { cveInfoTemplate, vulDataTemplate } from './htmlTemplate';
 
 export class AllVulnerabilitiesTreeviewDataProvider implements MyTreeDataProvider<TreeNode<any>> {
   private _onDidChangeTreeData: vscode.EventEmitter<TreeNodeUnionType> = new vscode.EventEmitter<TreeNodeUnionType>();
@@ -64,6 +66,16 @@ export class AllVulnerabilitiesTreeviewDataProvider implements MyTreeDataProvide
    */
   handleTreeItemClick(element: TreeNode<CveInfo | VulData>) {
     console.log('handleTreeItemClick', element);
+    let newHtmlContent = '';
+    const data = element.payloadData;
+    if (data instanceof CveInfo) {
+      newHtmlContent = cveInfoTemplate(data);
+    } else if (data instanceof VulData) {
+      newHtmlContent = vulDataTemplate(data);
+    } else {
+      return;
+    }
+    DetailWebviewViewProvider.refreshWebview(newHtmlContent);
   }
 
   getTreeItem(element: TreeNode<any>): vscode.TreeItem | Thenable<vscode.TreeItem> {
