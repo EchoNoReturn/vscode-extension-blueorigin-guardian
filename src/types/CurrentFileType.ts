@@ -20,26 +20,59 @@ export interface CurrentFileResponse {
  * 当前文件子目录节点
  */
 export interface CurrentFileItem {
+  /**
+   * artifact/author 开源组件名称
+   */
   artifact: string,
   author: string,
+  /**
+   * 漏洞列表
+   */
   cve: string,
   cve_severity: string,
+  /**
+   * 下载链接
+   */
   download_link: string,
   filelicense: string,
+  /**
+   * 文件路径
+   */
   fpath: string,
+  /**
+   * 匹配
+   */
   full: string,
   hits: string,
+  /**
+   * 特征匹配数
+   */
   hits2: string,
   homepage: string,
+  /**
+   * 主页
+   */
   homepage2: string,
   kbtype: string,
   key: string,
+  /**
+   * 许可证
+   */
   license: string,
+  /**
+   * 发布
+   */
   published_at: string,
   repos: string,
+  /**
+   * 星际
+   */
   score: string,
   source: string,
-  version: string
+  version: string,
+  /**
+   *  开源组件名称
+   */
   label: string,
   collapsibleState: number,
   children: []

@@ -130,7 +130,7 @@ export class CreateAllComponentsTreeviewDataProvider implements vscode.TreeDataP
     const unCveData: PkgdepItem[] = [];
     Object.keys(dataObj.pkgdep[proj!]).forEach((item: any, index) => {
       const it = dataObj.pkgdep[proj!][item];
-      it.label = item;
+      it.label = decodeURIComponent(item).split('"')[1];
       it.key = item + index;
       it.cve = dataObj.pkgdep[proj!][item].cve;
       it.pkg_vul = dataObj.pkgdep[proj!][item].pkg_vul;

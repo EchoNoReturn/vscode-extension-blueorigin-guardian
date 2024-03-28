@@ -10,7 +10,7 @@ export const viewManager = new class {
    * 当前文件视图数据提供者。单独拿出要做树图更新方法
    */
   private _currentFileTreeDataProvider: CurrentFileTreeDataProvider = new CurrentFileTreeDataProvider();
-  public _createAllComponentsTreeviewDataProvider: CreateAllComponentsTreeviewDataProvider = new CreateAllComponentsTreeviewDataProvider();
+  private _createAllComponentsTreeviewDataProvider: CreateAllComponentsTreeviewDataProvider = new CreateAllComponentsTreeviewDataProvider();
 
   /**
    * 所有 TreeView 都在此处注册

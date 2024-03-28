@@ -113,6 +113,13 @@ export function createAllLicensesTreeNode(licenses: LicensesResponse) {
  */
 export function CurrentFileTreeNode(currentFile: CurrentFileResponse) {
   /**
+   *当文件内容为ubdefined时，返回暂无数据
+   */
+  if (!vscode.window.activeTextEditor) {
+    return new TreeNode<any>('当前', vscode.TreeItemCollapsibleState.Expanded, undefined, [{ label: '暂无数据', collapsibleState: 0, children: [] }]);
+  }
+
+  /**
    * 当前文件目录
    */
   const baseOnTwoTree = [

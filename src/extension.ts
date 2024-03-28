@@ -33,8 +33,8 @@ export function activate(context: vscode.ExtensionContext) {
 		if (!editor) { return; }
 		viewManager.updateCurrentFileView(editor);
 	};
-
 	updateCurrentFileView(vscode.window.activeTextEditor);
+
 	/**
 	 * 切换文件更新当前文件情况
 	 */
