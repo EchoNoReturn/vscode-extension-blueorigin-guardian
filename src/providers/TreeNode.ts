@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { CompClass } from "../types/compviews";
 import { LicensesResponse } from '../types/licenses';
-import { CurrentFileResponse } from '../types/currentFileType';
+import { CurrentFileResponse } from '../types/currentFileTypes';
 import { CveSeverity } from '../shared';
 import { CveInfo, VulData } from '../types/cveviews';
 export class TreeNode<T> extends vscode.TreeItem {

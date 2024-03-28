@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { CurrentFileTreeNode, TreeNode } from './TreeNode';
 import reqBlue from '../requests/BlueBaseServer';
-import { CurrentFileResponse } from '../types/currentFileType';
+import { CurrentFileResponse } from '../types/currentFileTypes';
 import { TreeNodeUnionType } from '../types';
 import { getWorkSpaceFolder } from '../commands/scanner';
 export class CurrentFileTreeDataProvider implements vscode.TreeDataProvider<TreeNode<any>> {

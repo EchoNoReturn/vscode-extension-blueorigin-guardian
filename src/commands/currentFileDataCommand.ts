@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { listEmpty } from '../utils/detailsWebview';
 import { DetailWebviewViewProvider } from '../providers/DetailsWebviewViewProvider';
-import { CurrentFileItem } from '../types/currentFileType';
+import { CurrentFileItem } from '../types/currentFileTypes';
 import { formatDate } from '../utils/index';
 /**
  * 点击子目录命令
