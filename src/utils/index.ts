@@ -16,7 +16,7 @@ export function formatDate(isoString: string) {
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 /**
- * 处理合规、不合规、未定义
+ * 处理compliant、not compliant、undefined为中文合规、不合规、未定义
  */
 export const compliance = (node: string) => {
   if (node === "compliant") {
@@ -24,7 +24,10 @@ export const compliance = (node: string) => {
   } else if (node === "not compliant") {
     return '<span class="red">不合规</span>';
 
-  } else {
+  } else if (node === "partial compliant") {
+    return '<span class="yellow">部分合规</span>';
+  }
+  else {
     return '<span class="grey">未定义</span>';
   }
 };

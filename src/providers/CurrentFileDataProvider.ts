@@ -18,12 +18,23 @@ export class CurrentFileTreeDataProvider implements vscode.TreeDataProvider<Tree
   public currentFileLoading: boolean = true;
   private _VUL_SNIPPET_CVE: any[] = [];
   private rootNode: TreeNode<any> = CurrentFileTreeNode(this.currentFileList);
-  // constructor() {
-  //   this.postdata().finally(() => {
-  //     this.currentFileLoading = false;
-  //     this.refresh();
-  //   });
-  // }
+  constructor() {
+    /**
+     * 初始化文件为空，关闭加载效果
+     */
+    if (!vscode.window.activeTextEditor) {
+      this.currentFileLoading = false;
+    }
+    /**
+     *监听关闭所有文件，重新更新树视图
+     */
+    vscode.window.onDidChangeActiveTextEditor(document => {
+      if (!document) {
+        this.rootNode = CurrentFileTreeNode(this.currentFileList);
+        this._onDidChangeTreeData.fire();
+      }
+    });
+  }
 
   updateUI(): void {
     this.refresh();
@@ -53,7 +64,6 @@ export class CurrentFileTreeDataProvider implements vscode.TreeDataProvider<Tree
    * @returns {Promise<void>}
    */
   async postdata(filename: string) {
-
     /**
      * 使用项目名获取项目所有的组件视图
      */

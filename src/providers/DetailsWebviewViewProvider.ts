@@ -158,6 +158,9 @@ export class DetailWebviewViewProvider implements vscode.WebviewViewProvider {
           .green{
             color:green;
           }
+          .yellow{
+            color:#ffeb3b;
+          }
           .orange{
             color: orange;
           }

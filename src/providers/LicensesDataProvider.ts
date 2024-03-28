@@ -25,7 +25,9 @@ export class createAllLicensesTreeviewDataProvider implements vscode.TreeDataPro
       this.refresh();
     });
   }
-
+  /**
+   * 更新
+   */
   updateUI(): void {
     // TODO 更新数据并重新加载视图
     Object.keys(this.licensesList).forEach(key => {
