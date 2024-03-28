@@ -3,8 +3,8 @@ import { createAllLicensesTreeNode, TreeNode } from './TreeNode';
 import reqBlue from '../requests/BlueBaseServer';
 import { LicensesResponse, LicensesItem } from '../types/licenses';
 import { TreeNodeUnionType } from '../types';
-import { MyTreeDataProvider } from './AbstractProvider';
-export class AllLicensesTreeviewDataProvider implements MyTreeDataProvider<TreeNode<any>> {
+import { getWorkSpaceFolder } from '../commands/scanner';
+export class createAllLicensesTreeviewDataProvider implements vscode.TreeDataProvider<TreeNode<any>> {
   static componentsList(arg0: string, componentsList: any) {
     throw new Error('Method not implemented.');
   }
@@ -28,6 +28,10 @@ export class AllLicensesTreeviewDataProvider implements MyTreeDataProvider<TreeN
 
   updateUI(): void {
     // TODO 更新数据并重新加载视图
+    Object.keys(this.licensesList).forEach(key => {
+      this.licensesList[key as keyof LicensesResponse] = [];
+    });
+    this.postdata();
     this.refresh();
   }
 
@@ -55,28 +59,22 @@ export class AllLicensesTreeviewDataProvider implements MyTreeDataProvider<TreeN
    * @returns {Promise<void>}
    */
   async postdata() {
-    const activeUri = vscode.window.activeTextEditor?.document.uri;
-    if (!activeUri) {
-      return;
-    }
-    const workSpaceFolder = vscode.workspace.getWorkspaceFolder(activeUri);
-    if (!workSpaceFolder) {
-      return;
-    }
+    /**
+     * 获取项目名
+     */
+    const proj = getWorkSpaceFolder()?.name;
 
     /**
-   * 使用项目名获取项目所有的组件视图
-   */
-    const proj = 'kernel';
+     * 使用项目名获取项目所有的组件视图
+     */
+    // const proj = 'kernel';
     const res = await reqBlue.postData('/local2/getlicenseview', { proj });
     if (res.status === 200) {
       const data = this.handleData(res.data);
-      console.log('data', data);
       this.licensesList = data;
-
     } else {
       console.error(res.data);
-      vscode.window.showInformationMessage("蓝源卫士：获取所有组件数据异常");
+      vscode.window.showInformationMessage("蓝源卫士：获取所有许可证数据异常");
     }
   }
 
@@ -89,8 +87,8 @@ export class AllLicensesTreeviewDataProvider implements MyTreeDataProvider<TreeN
     const unCompliantLicenses: LicensesItem[] = [];
     const undefinedLicenses: LicensesItem[] = [];
     /**
- * 所有许可证数据处理
- */
+     * 所有许可证数据处理
+     */
     Object.keys(dataObj).forEach((item: any, index) => {
       const it = dataObj[item];
       it.label = item;
@@ -99,7 +97,7 @@ export class AllLicensesTreeviewDataProvider implements MyTreeDataProvider<TreeN
       it.collapsibleState = 0;
       licensesData.push(it);
       it.command = {
-        command: 'extension.currentFileData', // 使用你注册的命令的标识符  
+        command: 'blue.licensesData', // 使用你注册的命令的标识符  
         title: 'Open Repo', // 命令的标题，显示在 UI 上（可选）  
         arguments: [it] // 传递给命令的参数，这里传递了当前的 ExplorerNode  
       };

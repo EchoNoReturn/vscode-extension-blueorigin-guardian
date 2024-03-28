@@ -58,7 +58,7 @@ const reqBlue = new class {
       console.log('file', file);
       formData.append('file', file, { filename: projectName + '.zip' });
       console.log("成功获取压缩包流");
-      formData.getLength((err, length) => {
+      formData.getLength((err: any, length: number) => {
         if (err) {
           console.error(err);
           throw err;

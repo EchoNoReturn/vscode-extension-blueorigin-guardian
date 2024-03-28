@@ -1,28 +1,29 @@
 import * as vscode from 'vscode';
 import { CurrentFileTreeNode, TreeNode } from './TreeNode';
 import reqBlue from '../requests/BlueBaseServer';
-import { currentFileResponse } from '../types/CurrentFileType';
+import { CurrentFileResponse } from '../types/currentFileType';
 import { TreeNodeUnionType } from '../types';
-import { MyTreeDataProvider } from './AbstractProvider';
-export class CurrentFileTreeDataProvider implements MyTreeDataProvider<TreeNode<any>> {
+import { getWorkSpaceFolder } from '../commands/scanner';
+export class CurrentFileTreeDataProvider implements vscode.TreeDataProvider<TreeNode<any>> {
   static componentsList(arg0: string, componentsList: any) {
     throw new Error('Method not implemented.');
   }
   private _onDidChangeTreeData: vscode.EventEmitter<TreeNodeUnionType> = new vscode.EventEmitter<TreeNodeUnionType>();
   readonly onDidChangeTreeData: vscode.Event<TreeNodeUnionType> = this._onDidChangeTreeData.event;
-  public currentFileList: currentFileResponse = {
+  public currentFileList: CurrentFileResponse = {
     cveList: [],
     fullList: [],
     partialList: []
   };
   public currentFileLoading: boolean = true;
+  private _VUL_SNIPPET_CVE: any[] = [];
   private rootNode: TreeNode<any> = CurrentFileTreeNode(this.currentFileList);
-  constructor() {
-    this.postdata().finally(() => {
-      this.currentFileLoading = false;
-      this.refresh();
-    });
-  }
+  // constructor() {
+  //   this.postdata().finally(() => {
+  //     this.currentFileLoading = false;
+  //     this.refresh();
+  //   });
+  // }
 
   updateUI(): void {
     this.refresh();
@@ -51,26 +52,15 @@ export class CurrentFileTreeDataProvider implements MyTreeDataProvider<TreeNode<
    * 获取数据
    * @returns {Promise<void>}
    */
-  async postdata() {
-    const activeUri = vscode.window.activeTextEditor?.document.uri;
-    if (!activeUri) {
-      return;
-    }
-    const workSpaceFolder = vscode.workspace.getWorkspaceFolder(activeUri);
-    if (!workSpaceFolder) {
-      return;
-    }
-    // const proj = workSpaceFolder.name;
+  async postdata(filename: string) {
 
     /**
-   * 使用项目名获取项目所有的组件视图
-   */
-    const proj = 'kernel';
-    const res = await reqBlue.postData('/local2/getfile', { filename: "kernel/kernel/async.c" });
+     * 使用项目名获取项目所有的组件视图
+     */
+    const res = await reqBlue.postData('/local2/getfile', { filename });
     if (res.status === 200) {
       const data = this.handleData(res.data);
       this.currentFileList = data;
-
     } else {
       console.error(res.data);
       vscode.window.showInformationMessage("蓝源卫士：获取当前文件数据异常");
@@ -94,11 +84,11 @@ export class CurrentFileTreeDataProvider implements MyTreeDataProvider<TreeNode<
     t[0].full_match.forEach(
       (item: any, index: number) => {
         const it = item;
-        it.label = `${item.author}/${item.artifact}`;
+        it.label = `${item.author}/${item.artifact}:${item.version}`;
         it.children = [];
         it.collapsibleState = 0;
         it.command = {
-          command: 'extension.currentFileData', // 使用你注册的命令的标识符  
+          command: 'blue.currentFileData', // 使用你注册的命令的标识符  
           title: 'Open Repo', // 命令的标题，显示在 UI 上（可选）  
           arguments: [it] // 传递给命令的参数，这里传递了当前的 ExplorerNode  
         };
@@ -139,11 +129,11 @@ export class CurrentFileTreeDataProvider implements MyTreeDataProvider<TreeNode<
     t[0].snippet_match.forEach(
       (item: any, index: number) => {
         const it = item;
-        it.label = `${item.author}/${item.artifact}`;
+        it.label = `${item.author}/${item.artifact}:${item.version}`;
         it.children = [];
         it.collapsibleState = 0;
         it.command = {
-          command: 'extension.currentFileData', // 使用你注册的命令的标识符  
+          command: 'blue.currentFileData', // 使用你注册的命令的标识符  
           title: 'Open Repo', // 命令的标题，显示在 UI 上（可选）  
           arguments: [it] // 传递给命令的参数，这里传递了当前的 ExplorerNode  
         };
@@ -185,19 +175,15 @@ export class CurrentFileTreeDataProvider implements MyTreeDataProvider<TreeNode<
   update(editor: vscode.TextEditor) {
     this.currentFileLoading = true;
     this.refresh();
-    // 拿到文件路径
+    /**
+     * 获取项目名
+     */
+    let folderName = getWorkSpaceFolder()?.name;
+    /**
+     * 获取文件路径
+     */
     const activeFileUri = editor.document.uri;
     const activeFilePath = activeFileUri.fsPath;
-    //获取文件名
-    let folderName = "";
-    const workspaceFolders = vscode.workspace.workspaceFolders;
-    if (workspaceFolders) {
-      // 遍历每个工作区文件夹  
-      workspaceFolders.forEach(folder => {
-        // 获取文件夹的名字  
-        folderName = folder.name;
-      });
-    }
     const FilePathArr = activeFilePath.split('\\');
     let itemIndex = 0;
     FilePathArr.forEach((item, index) => {
@@ -205,13 +191,16 @@ export class CurrentFileTreeDataProvider implements MyTreeDataProvider<TreeNode<
         return itemIndex = index;
       }
     });
-    let now = "";
+    let now = folderName + "/";
     for (let i = itemIndex; i < FilePathArr.length; i++) {
       now += FilePathArr[i] + "/";
     }
-    console.log('nowwww', now.slice(0, -1));
-    // 发起请求
-    this.postdata().finally(() => {
+
+    const filename = now.slice(0, -1);
+    /**
+     * 发起请求
+     */
+    this.postdata(filename).finally(() => {
       this.currentFileLoading = false;
       this.refresh();
     });

@@ -2,10 +2,9 @@ import * as vscode from 'vscode';
 import { AllVulnerabilitiesTreeviewDataProvider } from './providers/AllVulTreeviewDataProvider';
 import { CurrentFileTreeDataProvider } from './providers/CurrentFileDataProvider';
 import { CreateAllComponentsTreeviewDataProvider } from './providers/ComponentsDataProvider';
-import { AllLicensesTreeviewDataProvider } from './providers/LicensesDataProvider';
 import { DetailWebviewViewProvider } from './providers/DetailsWebviewViewProvider';
 import { MyTreeDataProvider } from './providers/AbstractProvider';
-
+import { createAllLicensesTreeviewDataProvider } from './providers/LicensesDataProvider';
 export const viewManager = new class {
   /**
    * 当前文件视图数据提供者。单独拿出要做树图更新方法
@@ -33,7 +32,7 @@ export const viewManager = new class {
     /**
     * 所有许可证视图数据提供者
     */
-    blueOrigin_guardian_licenses: new AllLicensesTreeviewDataProvider(),
+    blueOrigin_guardian_licenses: new createAllLicensesTreeviewDataProvider(),
   };
 
   /**
