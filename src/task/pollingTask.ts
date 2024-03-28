@@ -53,6 +53,8 @@ export const pollingProjectStatus = pollingTask(async () => {
     case ProjectStatus.FINISHED:
       pollingProjectStatus.stop();
       // 扫描完成，重新加载数据
+      vscode.commands.executeCommand('vscode-extension-blueorigin-guardian.refresh');
+      vscode.window.showInformationMessage("蓝源卫士：项目数据已更新");
       break;
     case ProjectStatus.STARTED:
       // 扫描中
@@ -65,6 +67,8 @@ export const pollingProjectStatus = pollingTask(async () => {
     case ProjectStatus.UNKNOWN:
       console.log("项目状态未知，解除轮询");
       pollingProjectStatus.stop();
+      vscode.commands.executeCommand('vscode-extension-blueorigin-guardian.refresh');
+      vscode.window.showErrorMessage("蓝源卫士：项目状态异常");
       break;
   };
 }, 5000);
