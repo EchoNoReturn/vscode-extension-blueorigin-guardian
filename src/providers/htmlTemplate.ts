@@ -2,19 +2,40 @@ import { CveSeverity } from "../shared";
 import { CveInfo, VulData } from "../types/cveviews";
 import { MessageType } from "./DetailsWebviewViewProvider";
 
-export const cveInfoTemplate = (data: CveInfo): string => {
-  let color = '';
-  switch (data.severity) {
+/**
+ * 打开文件的script方法，用于插入到 html 模板中
+ */
+export const openFileScript = `
+<script>
+const vscode = acquireVsCodeApi();
+const openfile = (path, lineNumber, columeNumber, payloadStr) => {
+  console.log(path, lineNumber, columeNumber);
+  vscode.postMessage({
+    command: 'openFile',
+    filePath: path,
+    lineNumber: lineNumber,
+    columeNumber: columeNumber,
+    payloadStr: payloadStr
+  });
+}
+</script>
+`;
+
+export const chooseColor = (s: CveSeverity) => {
+  switch (s) {
     case CveSeverity.HIGH:
-      color = 'red';
-      break;
+      return 'red';
     case CveSeverity.MEDIUM:
-      color = 'orange';
-      break;
+      return 'orange';
     case CveSeverity.LOW:
-      color = 'green';
-      break;
+      return 'green';
+    default:
+      return '';
   }
+};
+
+export const cveInfoTemplate = (data: CveInfo): string => {
+  const color = chooseColor(data.severity);
   const matchFileList = data.proj_files.map(item => {
     if (typeof item === 'object') {
       const plusList: string[] = [];
@@ -26,14 +47,16 @@ export const cveInfoTemplate = (data: CveInfo): string => {
     return item;
   });
   return `
-  <h3>漏洞详情</h3>
+  <h3>组件漏洞</h3>
   <div>漏洞代号： <span>${data.cve}</span></div>
   <div>严重性：<span class="${color}">${data.severity}</span></div>
   <div>漏洞类型： <span>${data.type}</span></div >
   <div class="center">影响文件</div>
   <div>${renderMetchFileList(matchFileList, 'openFile')}</div>
   <h3>修复建议</h3>
-  <div style="margin-bottom: 10px;">请参考<a href="http://nvd.nist.gov/vuln/detail/${data.cve}">http://nvd.nist.gov/vuln/detail/${data.cve}</a>进行修复</div>`;
+  <div style="margin-bottom: 10px;">请参考<a href="http://nvd.nist.gov/vuln/detail/${data.cve}">http://nvd.nist.gov/vuln/detail/${data.cve}</a>进行修复</div>
+  ${openFileScript}
+  `;
 };
 
 /**
@@ -42,33 +65,23 @@ export const cveInfoTemplate = (data: CveInfo): string => {
  * @returns html模板
  */
 export const vulDataTemplate = (data: VulData): string => {
-  let color = '';
-  switch (data.severity) {
-    case CveSeverity.HIGH:
-      color = 'red';
-      break;
-    case CveSeverity.MEDIUM:
-      color = 'orange';
-      break;
-    case CveSeverity.LOW:
-      color = 'green';
-      break;
-  }
+  const color = chooseColor(data.severity);
   const matchFileList = data.codelines.map((line) => {
     const basePath = data.filePath.split('/').slice(1).join('/');
     return `${basePath}:${line[0]},${line[1]}`;
   });
   return `
-  <h3>漏洞详情</h3>
+  <h3>代码漏洞</h3>
   <div>漏洞代号： <span>${data.cve}</span></div>
   <div>严重性：<span class="${color}">${data.severity}</span></div>
   <div>参考链接：<a href="https://nvd.nist.gov/vuln/detail/${data.cve}">https://nvd.nist.gov/vuln/detail/${data.cve}</a></div >
   <h3>影响文件</h3>
-  <div>${renderMetchFileList(matchFileList, 'openFile')}</div>
+  <div style="margin-bottom: 10px;">${renderMetchFileList(matchFileList, 'openFile', JSON.stringify(data))}</div>
+  ${openFileScript}
   `;
 };
 
-export function renderMetchFileList(data: string[], action?: MessageType['command']) {
+export function renderMetchFileList(data: string[], action?: MessageType['command'], payload?: string) {
   if (!data.length) {
     return `
     <div class="center">暂无数据</div>
@@ -88,8 +101,11 @@ export function renderMetchFileList(data: string[], action?: MessageType['comman
       message.filePath = filepathArr[0];
       message.lineNumber = +filepathArr[1].split(',')[0];
       message.columeNumber = +filepathArr[1].split(',')[1];
+      payload && (message.payloadStr = payload);
     }
-    return `<div onclick=onclick="(function(){console.log('click!');vscode.postMessage(${JSON.stringify(message)})})()"><a href="#">${filepath}</a></div>`;
+    return `
+    <script>const payload = ${JSON.stringify(payload)};</script>
+    <div style="cursor: pointer;" onclick="openfile('${message.filePath}',${message.lineNumber ?? 1},${message.columeNumber ?? 0},payload)"><a>${filepath}</a></div>`;
   }).join('');
 }
 

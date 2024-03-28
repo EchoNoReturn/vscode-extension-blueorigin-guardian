@@ -119,8 +119,8 @@ export class VulData {
     this.matchRepositoryOwner = infoSplits[1];
     this.matchRepositoryName = infoSplits[2];
     this.matchCommitId = infoSplits[3];
-    this.matchDiffCommitId = infoSplits[4];
-    this.matchFilePath = infoSplits[5];
+    this.matchFilePath = infoSplits[4];
+    this.matchDiffCommitId = infoSplits[5];
     this.codelines = codeLines;
     this.info = info;
   }

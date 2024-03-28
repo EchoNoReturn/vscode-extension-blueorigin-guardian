@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import reqBlue from "../requests/BlueBaseServer";
 import { zipDir } from "../utils/compressFiles";
 import { pollingProjectStatus } from "../task/pollingTask";
+import { WorkspaceFolder } from "vscode";
 
 /**
  * 运行扫描
@@ -102,9 +103,8 @@ export const checkConfig = () => {
 
 /**
  * 获取工作空间的信息
- * @returns {string | undefined}
  */
-export const getWorkSpaceFolder = () => {
+export const getWorkSpaceFolder = (): WorkspaceFolder | undefined => {
   const activeUri = vscode.window.activeTextEditor?.document.uri;
   if (!activeUri) { return; }
   return vscode.workspace.getWorkspaceFolder(activeUri);

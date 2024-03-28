@@ -1,3 +1,5 @@
+import path from "path";
+
 /**
  * 处理时间格式
  */
@@ -26,3 +28,22 @@ export const compliance = (node: string) => {
     return '<span class="grey">未定义</span>';
   }
 };
+
+/**
+ * 通过文件路径中的文件后缀确定语言类型
+ * @param filePath 文件路徑
+ * @returns 语言类型
+ */
+export function getLanguage(filePath: string) {
+  const ext = path.extname(filePath);
+  const language = ext.slice(1);
+  if (['js','jsx'].includes(language)) {
+    return "javascript";
+  } else if (['ts', 'tsx'].includes(language)) {
+    return "typescript";
+  } else if (language === "py") {
+    return "python";
+  } else {
+    return language;
+  }
+}
