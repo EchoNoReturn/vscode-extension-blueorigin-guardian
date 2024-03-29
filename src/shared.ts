@@ -25,10 +25,10 @@ export enum CveSeverity {
  * 项目状态
  */
 export enum ProjectStatus {
-  STARTED = "开始",
+  STARTED = "正在扫描",
   FINISHED = "完成",
   ERROR = "错误",
-  PENDING = "等待",
+  PENDING = "等待中",
   UNKNOWN = "未知"
 }
 

@@ -1,14 +1,19 @@
-# vscode-extension-blueorigin-guardian README
+# 蓝源卫士--VScode插件
 
-This is the README for your extension "vscode-extension-blueorigin-guardian". After writing up a brief description, we recommend including the following sections.
+蓝源卫士是一个针对项目源代码进行开源匹配扫描的开源治理工具，支持市面上几乎所有的开发语言扫描。通过蓝源卫士，可以简单、直观的发现代码中涉及的安全漏洞，并获取对应的修复建议，可以分析得到项目中涉及的软件资产。
+
+## 项目启动
+
+按 F5 即可。
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+开源代码匹配扫描：
 
-For example if there is an image subfolder under your extension project workspace:
-
-\!\[feature X\]\(images/feature-x.png\)
+- 开源检测-组件分析
+- 许可证合规性检测
+- 开源漏洞检测
+- ...
 
 > Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
 
