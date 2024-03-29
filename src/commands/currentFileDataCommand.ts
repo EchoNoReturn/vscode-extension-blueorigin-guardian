@@ -16,12 +16,12 @@ export const currentFileDataCommand = (context: vscode.ExtensionContext) => {
     const newBodyContent = `<div>开源组件名称：${node.label}</div>
       <div>文件路径：${node.fpath}</div>
       <div>匹配：${node.full}</div>
-      <div>特征匹配数：${node.hits2}</div>
+      <div>特征匹配数：${node.hitsMain}</div>
       <div>星际：${node.score}</div>
       <div>版本：${node.version}</div>
       <div>许可证：${node.license}</div>
       <div>发布：${formatDate(node.published_at)}</div>
-      <div>主页：<a href=${node.homepage2}>${node.homepage2}</a></div>
+      <div>主页：<a href=${node.homepageMain}>${node.homepageMain}</a></div>
       <div>下载：<a href=${node.download_link}>${node.download_link}</a></div>
       <div class="center">漏洞列表</div>
       <div class="cveDiv">${listEmpty(node.cve)}</div>`;

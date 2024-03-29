@@ -14,9 +14,10 @@ export class createAllLicensesTreeviewDataProvider implements vscode.TreeDataPro
     licensesData: [],
     compliantLicenses: [],
     unCompliantLicenses: [],
+    partialLicenses: [],
     undefinedLicenses: []
   };
-  public licensesLoading: boolean = true;
+  public licensesLoading: boolean = false;
   private _VUL_SNIPPET_CVE: any[] = [];
   private rootNode: TreeNode<any> = createAllLicensesTreeNode(this.licensesList);
   constructor() {
@@ -30,13 +31,15 @@ export class createAllLicensesTreeviewDataProvider implements vscode.TreeDataPro
    */
   updateUI(): void {
     // TODO 更新数据并重新加载视图
-    Object.keys(this.licensesList).forEach(key => {
-      this.licensesList[key as keyof LicensesResponse] = [];
+    // Object.keys(this.licensesList).forEach(key => {
+    //   this.licensesList[key as keyof LicensesResponse] = [];
+    // });
+
+    this.postdata().finally(() => {
+      this.licensesLoading = false;
+      this.refresh();
     });
-    this.licensesLoading = true;
-    this.refresh();
-    this.postdata();
-    this.refresh();
+
   }
 
   getTreeItem(element: TreeNode<any>): vscode.TreeItem | Thenable<vscode.TreeItem> {
@@ -52,7 +55,6 @@ export class createAllLicensesTreeviewDataProvider implements vscode.TreeDataPro
   }
 
   refresh(): void {
-
     this.rootNode = createAllLicensesTreeNode(this.licensesList);
     this._onDidChangeTreeData.fire();
 
@@ -66,12 +68,18 @@ export class createAllLicensesTreeviewDataProvider implements vscode.TreeDataPro
     /**
      * 获取项目名
      */
-    const proj = getWorkSpaceFolder()?.name;
-
+    const workSpaceFolder = getWorkSpaceFolder();
+    // 以目前活动的文集作为基准定位项目名称，如果没有则获取所有项目的第一个
+    const proj = workSpaceFolder?.name ?? vscode.workspace.workspaceFolders?.[0].name;
+    if (!proj) {
+      vscode.window.showInformationMessage("蓝源卫士：获取当前项工作空间项目信息错误");
+      return;
+    }
     /**
      * 使用项目名获取项目所有的组件视图
      */
-    // const proj = 'kernel';
+    this.licensesLoading = true;
+    this.refresh();
     const res = await reqBlue.postData('/local2/getlicenseview', { proj });
     if (res.status === 200) {
       const data = this.handleData(res.data);
@@ -89,30 +97,34 @@ export class createAllLicensesTreeviewDataProvider implements vscode.TreeDataPro
     const licensesData: LicensesItem[] = [];
     const compliantLicenses: LicensesItem[] = [];
     const unCompliantLicenses: LicensesItem[] = [];
+    const partialLicenses: LicensesItem[] = [];
     const undefinedLicenses: LicensesItem[] = [];
     /**
      * 所有许可证数据处理
      */
     Object.keys(dataObj).forEach((item: any, index) => {
-      const it = dataObj[item];
-      it.label = item;
-      it.key = item + index;
-      it.compliance = dataObj[item].compliance;
-      it.collapsibleState = 0;
-      licensesData.push(it);
-      it.command = {
+      const it_item = dataObj[item];
+      it_item.label = item;
+      it_item.key = item + index;
+      it_item.compliance = dataObj[item].compliance;
+      it_item.collapsibleState = 0;
+      licensesData.push(it_item);
+      it_item.command = {
         command: 'blue.licensesData', // 使用你注册的命令的标识符  
         title: 'Open Repo', // 命令的标题，显示在 UI 上（可选）  
-        arguments: [it] // 传递给命令的参数，这里传递了当前的 ExplorerNode  
+        arguments: [it_item] // 传递给命令的参数，这里传递了当前的 ExplorerNode  
       };
-      if (it.compliance === "compliant") {
-        compliantLicenses.push(it);
-      } else if (it.compliance === "undefined") {
-        undefinedLicenses.push(it);
-      } else {
-        unCompliantLicenses.push(it);
+      if (it_item.compliance === "compliant") {
+        compliantLicenses.push(it_item);
+      } else if (it_item.compliance === "undefined") {
+        undefinedLicenses.push(it_item);
+      } else if (it_item.compliance === "partial compliant") {
+        partialLicenses.push(it_item);
+      }
+      else {
+        unCompliantLicenses.push(it_item);
       }
     });
-    return { licensesData, compliantLicenses, undefinedLicenses, unCompliantLicenses };
+    return { licensesData, compliantLicenses, undefinedLicenses, partialLicenses, unCompliantLicenses };
   }
 }

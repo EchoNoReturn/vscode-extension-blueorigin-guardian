@@ -47,12 +47,12 @@ export interface CurrentFileItem {
   /**
    * 特征匹配数
    */
-  hits2: string,
+  hitsMain: string,
   homepage: string,
   /**
    * 主页
    */
-  homepage2: string,
+  homepageMain: string,
   kbtype: string,
   key: string,
   /**

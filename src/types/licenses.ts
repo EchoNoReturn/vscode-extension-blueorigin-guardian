@@ -15,6 +15,10 @@ export interface LicensesResponse {
    */
   unCompliantLicenses: LicensesItem[],
   /**
+   * 部分合规许可证
+   */
+  partialLicenses: LicensesItem[],
+  /**
    * 未定义许可证
    */
   undefinedLicenses: LicensesItem[],
