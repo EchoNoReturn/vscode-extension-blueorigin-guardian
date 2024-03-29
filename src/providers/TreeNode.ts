@@ -103,6 +103,7 @@ export function createAllLicensesTreeNode(licenses: LicensesResponse) {
   const baseOnTwoTree = [
     { label: `合规(${licenses.compliantLicenses.length})`, collapsibleState: !licenses.compliantLicenses.length ? 0 : 1, children: licenses.compliantLicenses },
     { label: `不合规(${licenses.unCompliantLicenses.length})`, collapsibleState: !licenses.unCompliantLicenses.length ? 0 : 1, children: licenses.unCompliantLicenses },
+    { label: `部分合规(${licenses.partialLicenses.length})`, collapsibleState: !licenses.partialLicenses.length ? 0 : 1, children: licenses.partialLicenses },
     { label: `未定义(${licenses.undefinedLicenses.length})`, collapsibleState: !licenses.undefinedLicenses.length ? 0 : 1, children: licenses.undefinedLicenses },
   ];
   return new TreeNode<any>('所有组件', vscode.TreeItemCollapsibleState.Expanded, undefined, baseOnTwoTree);

@@ -13,6 +13,10 @@ export const licensesDataCommand = (context: vscode.ExtensionContext) => {
      * 这里实现你的点击命令逻辑
      * 传送的数据是所有许可证
      */
+
+    /**
+     *  从本地json文件重获取到相应的许可证
+     */
     const license = license_zh_cn.slice(0);
     const lis = [];
     for (let i = 0; i < license.length; i += 1) {
@@ -30,6 +34,9 @@ export const licensesDataCommand = (context: vscode.ExtensionContext) => {
       <div>合规性：${compliance(node.compliance)}</div>
     <div>参考地址：<a href=${lis[0].info}> ${lis[0].info} </a></div >`;
 
+    /**
+     *  创建许可证详情视图
+     */
     const webviewPanel = vscode.window.createWebviewPanel(
       'myWebview',//视图类型
       node.label,//视图标题

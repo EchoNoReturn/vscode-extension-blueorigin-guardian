@@ -4,6 +4,7 @@ import reqBlue from '../requests/BlueBaseServer';
 import { CurrentFileResponse } from '../types/currentFileTypes';
 import { TreeNodeUnionType } from '../types';
 import { getWorkSpaceFolder } from '../commands/scanner';
+import { currentFilesItem } from '../utils/index';
 export class CurrentFileTreeDataProvider implements vscode.TreeDataProvider<TreeNode<any>> {
   static componentsList(arg0: string, componentsList: any) {
     throw new Error('Method not implemented.');
@@ -81,7 +82,7 @@ export class CurrentFileTreeDataProvider implements vscode.TreeDataProvider<Tree
    * 处理相应结果
    */
   handleData(dataObj: { scan_result: any }) {
-    const t: any = Object.values(
+    const scan_result: any = Object.values(
       JSON.parse(dataObj.scan_result),
     );
     //完全匹配开源库
@@ -91,91 +92,26 @@ export class CurrentFileTreeDataProvider implements vscode.TreeDataProvider<Tree
     //漏洞
     const cveList: any = [];
     //完全匹配开源库数据处理
-    t[0].full_match.forEach(
+    scan_result[0].full_match.forEach(
       (item: any, index: number) => {
-        const it = item;
-        it.label = `${item.author}/${item.artifact}:${item.version}`;
-        it.children = [];
-        it.collapsibleState = 0;
-        it.command = {
-          command: 'blue.currentFileData', // 使用你注册的命令的标识符  
-          title: 'Open Repo', // 命令的标题，显示在 UI 上（可选）  
-          arguments: [it] // 传递给命令的参数，这里传递了当前的 ExplorerNode  
-        };
-        if (it.homepage === 'null') {
-          const abc = it.fpath.split('/');
-          const t1 = abc[0].slice(
-            0,
-            abc[0].lastIndexOf('-'),
-          );
-          const t2 = t1.slice(
-            0,
-            t1.lastIndexOf('-'),
-          );
-          const t3 = t1.slice(
-            t1.lastIndexOf('-') + 1,
-          );
-          it.homepage2 = `https://github.com/${t2}/${t3}`;
-        } else {
-          it.homepage2 = it.homepage;
-        }
-
-        it.repos = `${item.author}/${item.artifact}`;
-        it.score = `${item.score}`;
-        it.key = item.artifact + index;
-        it.full = 'full (100%)';
-        it.hits2 = item.hits.slice(
-          0,
-          item.hits.indexOf(','),
-        );
-        fullList.push(it);
+        /**
+         * 处理item数据
+         */
+        currentFilesItem(item, index, 'full(100%)');
+        fullList.push(currentFilesItem(item, index, 'full(100%)'));
         //漏洞不为空，添加漏洞
-        if (it.cve !== '') {
-          cveList.push(it);
+        if (currentFilesItem(item, index, 'full(100%)').cve !== '') {
+          cveList.push(currentFilesItem(item, index, 'full(100%)'));
         }
       },
     );
     //部分匹配开源库数据处理
-    t[0].snippet_match.forEach(
+    scan_result[0].snippet_match.forEach(
       (item: any, index: number) => {
-        const it = item;
-        it.label = `${item.author}/${item.artifact}:${item.version}`;
-        it.children = [];
-        it.collapsibleState = 0;
-        it.command = {
-          command: 'blue.currentFileData', // 使用你注册的命令的标识符  
-          title: 'Open Repo', // 命令的标题，显示在 UI 上（可选）  
-          arguments: [it] // 传递给命令的参数，这里传递了当前的 ExplorerNode  
-        };
-        if (it.homepage === 'null') {
-          const abc = it.fpath.split('/');
-          const t1 = abc[0].slice(
-            0,
-            abc[0].lastIndexOf('-'),
-          );
-          const t2 = t1.slice(
-            0,
-            t1.lastIndexOf('-'),
-          );
-          const t3 = t1.slice(
-            t1.lastIndexOf('-') + 1,
-          );
-          it.homepage2 = `https://github.com/${t2}/${t3}`;
-        } else {
-          it.homepage2 = it.homepage;
-        }
-        it.repos = `${item.author}/${item.artifact}`;
-        it.score = `${item.score}`;
-        it.key = item.artifact + index;
-        it.full = 'partial';
-        it.hits2 = item.hits.slice(
-          0,
-          item.hits.indexOf(','),
-        );
-        partialList.push(it);
+        partialList.push(currentFilesItem(item, index, 'partial'));
         //漏洞不为空，添加漏洞
-        if (it.cve !== '') {
-          cveList.push(it);
+        if (currentFilesItem(item, index, 'partial').cve !== '') {
+          cveList.push(currentFilesItem(item, index, 'partial'));
         }
       },
     );
@@ -188,7 +124,13 @@ export class CurrentFileTreeDataProvider implements vscode.TreeDataProvider<Tree
     /**
      * 获取项目名
      */
-    let folderName = getWorkSpaceFolder()?.name;
+    const workSpaceFolder = getWorkSpaceFolder();
+    // 以目前活动的文集作为基准定位项目名称，如果没有则获取所有项目的第一个
+    const folderName = workSpaceFolder?.name ?? vscode.workspace.workspaceFolders?.[0].name;
+    if (!folderName) {
+      vscode.window.showInformationMessage("蓝源卫士：获取当前项工作空间项目信息错误");
+      return;
+    }
     /**
      * 获取文件路径
      */
