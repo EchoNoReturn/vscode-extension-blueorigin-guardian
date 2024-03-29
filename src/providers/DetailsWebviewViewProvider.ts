@@ -119,8 +119,7 @@ export class DetailWebviewViewProvider implements vscode.WebviewViewProvider {
       const srcDocument = await vscode.workspace.openTextDocument({ content: result.src_c });
       const dstDocument = await vscode.workspace.openTextDocument({ content: result.dst_c });
       vscode.commands.executeCommand('vscode.diff', srcDocument.uri, dstDocument.uri, `${result.dst_fn} - ${result.dst_fn}`, {
-        selection: new vscode.Range(currentRange[0] - 1, currentRange[1], currentRange[0] - 1, currentRange[1]),
-        language: getLanguage(result.dst_c)
+        selection: new vscode.Range(currentRange[0] - 1, currentRange[1], currentRange[0] - 1, currentRange[1])
       });
     }
   }

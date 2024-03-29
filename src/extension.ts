@@ -4,7 +4,6 @@ import { currentFileDataCommand } from './commands/currentFileDataCommand';
 import { componentsDataCommand } from './commands/componentsDataCommand';
 import { licensesDataCommand } from './commands/licensesDataCommand';
 
-import { DetailWebviewViewProvider } from './providers/DetailsWebviewViewProvider';
 // 假设的对象类型  
 import { reScan, runScanner } from './commands/scanner';
 import { pollingProjectStatus } from './task/pollingTask';
@@ -23,8 +22,6 @@ export function activate(context: vscode.ExtensionContext) {
 	 * 执行所有许可证情况命令
 	 */
 	licensesDataCommand(context);
-
-
 
 
 	viewManager.init();
