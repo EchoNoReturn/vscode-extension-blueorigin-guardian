@@ -3,6 +3,8 @@ import { join } from 'path';
 import { getWorkSpaceFolder } from "../commands/scanner";
 import reqBlue from "../requests/BlueBaseServer";
 import { getLanguage } from "../utils";
+import { ProjectStatus } from "../shared";
+import { projectStatusTemplate } from "./htmlTemplate";
 export interface VulFixResponse {
   dst_c: string;
   dst_fn: string;
@@ -62,6 +64,7 @@ export class DetailWebviewViewProvider implements vscode.WebviewViewProvider {
         );
         if (message.payloadStr) {
           const payloadData = JSON.parse(message.payloadStr);
+          // 零信任，判断是否能够满足发起请求
           if (payloadData.info && payloadData.codelines && payloadData.filePath) {
             this.openHowToFix({
               matched_commit: (payloadData.info as string).split('__//__').slice(0, -1).join('__//__'),
@@ -181,5 +184,28 @@ export class DetailWebviewViewProvider implements vscode.WebviewViewProvider {
       // 如果当前没有 webview 视图，你可以根据需要处理这种情况，例如显示错误消息
       console.error("No webview view available to refresh.");
     }
+  }
+
+  /**
+   * 向webview提供项目状态信息
+   * @param status 状态信息
+   */
+  public static postStatusMessage(status: string) {
+    if (DetailWebviewViewProvider.currentView) {
+      DetailWebviewViewProvider.currentView.webview.postMessage({
+        command: 'status',
+        text: status
+      });
+    }
+  }
+
+  /**
+   * 初始化项目状态的详情页面
+   * @param state 项目状态
+   */
+  public static async projectStatusWebview(state: ProjectStatus) {
+    DetailWebviewViewProvider.refreshWebview(projectStatusTemplate);
+    DetailWebviewViewProvider.postStatusMessage(state);
+    vscode.commands.executeCommand('blueOrigin_guardian_details.focus');
   }
 }

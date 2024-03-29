@@ -21,6 +21,22 @@ const openfile = (path, lineNumber, columeNumber, payloadStr) => {
 </script>
 `;
 
+export const projectStatusTemplate = `
+<div>项目扫描状态：</div>
+<div><span id="status"></span></div>
+<script>
+  const status = document.getElementById('status');
+  // 监听来自扩展程序的消息
+  window.addEventListener('message', event => {
+    const message = event.data;
+    switch (message.command) {
+      case 'status':
+        status.innerText = message.text;
+        break;
+    }
+  });
+</script>`;
+
 export const chooseColor = (s: CveSeverity) => {
   switch (s) {
     case CveSeverity.HIGH:

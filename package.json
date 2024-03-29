@@ -35,6 +35,15 @@
           "light": "resources/refresh_black.svg",
           "dark": "resources/refresh_white.svg"
         }
+      }, 
+      {
+        "command": "vscode-extension-blueorigin-guardian.searchProjectStatus",
+        "title": "查询项目状态",
+        "category": "blueorigin",
+        "icon": {
+          "light": "resources/Status_black.svg",
+          "dark": "resources/Status_white.svg"
+        }
       }
     ],
     "viewsContainers": {
@@ -78,6 +87,11 @@
       "view/title": [
         {
           "command": "vscode-extension-blueorigin-guardian.refresh",
+          "group": "navigation",
+          "when": "view == blueOrigin_guardian_details"
+        },
+        {
+          "command": "vscode-extension-blueorigin-guardian.searchProjectStatus",
           "group": "navigation",
           "when": "view == blueOrigin_guardian_details"
         }
