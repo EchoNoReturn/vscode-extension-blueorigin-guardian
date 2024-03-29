@@ -108,21 +108,28 @@ export class AllVulnerabilitiesTreeviewDataProvider implements MyTreeDataProvide
       return;
     }
     // 使用项目名获取项目所有的漏洞视图
-    const res = await reqBlue.postData('/local2/getcveview', { proj });
-    if (res.status === 200) {
-      this.handleData(res.data);
+    try {
+      const res = await reqBlue.postData('/local2/getcveview', { proj });
+      if (res.status === 200) {
+        this.handleData(res.data);
+        this.rootNode = createAllVulnerabilitiesTreeNode(this.cveInfo, this.codeVulInfo);
+        this.refresh();
+      } else {
+        console.error(res.data);
+        this.rootNode = new TreeNode(
+          'root',
+          vscode.TreeItemCollapsibleState.None,
+          undefined, [new TreeNode("暂无数据", vscode.TreeItemCollapsibleState.None)]
+        );
+        this.refresh();
+        vscode.window.showInformationMessage("蓝源卫士：获取漏洞数据异常");
+      }
+    } catch (error) {
       this.rootNode = createAllVulnerabilitiesTreeNode(this.cveInfo, this.codeVulInfo);
       this.refresh();
-    } else {
-      console.error(res.data);
-      this.rootNode = new TreeNode(
-        'root',
-        vscode.TreeItemCollapsibleState.None,
-        undefined, [new TreeNode("暂无数据", vscode.TreeItemCollapsibleState.None)]
-      );
-      this.refresh();
-      vscode.window.showInformationMessage("蓝源卫士：获取漏洞数据异常");
+      vscode.window.showErrorMessage("蓝源卫士：获取漏洞数据异常");
     }
+    
   }
 
   /**

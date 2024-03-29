@@ -33,6 +33,8 @@ export class createAllLicensesTreeviewDataProvider implements vscode.TreeDataPro
     Object.keys(this.licensesList).forEach(key => {
       this.licensesList[key as keyof LicensesResponse] = [];
     });
+    this.licensesLoading = true;
+    this.refresh();
     this.postdata();
     this.refresh();
   }

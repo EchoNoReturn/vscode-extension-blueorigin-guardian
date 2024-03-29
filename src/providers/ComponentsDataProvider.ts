@@ -36,12 +36,14 @@ export class CreateAllComponentsTreeviewDataProvider implements vscode.TreeDataP
     });
   }
 
-  updateUI(): void {
-    // TODO 更新数据并重新加载视图
+  async updateUI(): Promise<void> {
     Object.keys(this.componentsList).forEach(key => {
       this.componentsList[key as keyof CompClass] = [];
     });
-    this.postdata();
+    this.componentsLoading = true;
+    this.refresh();
+    await this.postdata();
+    this.componentsLoading = false;
     this.refresh();
   }
 
@@ -83,7 +85,7 @@ export class CreateAllComponentsTreeviewDataProvider implements vscode.TreeDataP
       this.componentsList = data;
     } else {
       console.error(res.data);
-      vscode.window.showInformationMessage("蓝源卫士：获取所有组件数据异常");
+      vscode.window.showErrorMessage("蓝源卫士：获取所有组件数据异常");
     }
   }
 
