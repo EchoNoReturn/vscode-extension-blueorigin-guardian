@@ -3,14 +3,9 @@ import { viewManager } from './ViewManager';
 import { currentFileDataCommand } from './commands/currentFileDataCommand';
 import { componentsDataCommand } from './commands/componentsDataCommand';
 import { licensesDataCommand } from './commands/licensesDataCommand';
-
-import { DetailWebviewViewProvider } from './providers/DetailsWebviewViewProvider';
-// 假设的对象类型  
 import { reScan, runScanner } from './commands/scanner';
 import { pollingProjectStatus } from './task/pollingTask';
-
 export function activate(context: vscode.ExtensionContext) {
-
 	/**
 	 * 执行当前文件情况命令
 	 */

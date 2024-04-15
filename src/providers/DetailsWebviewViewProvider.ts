@@ -25,11 +25,11 @@ export type MessageType = {
 
 export class DetailWebviewViewProvider implements vscode.WebviewViewProvider {
   public static currentView: vscode.WebviewView | undefined;
-
+  public static title: string | undefined;
   public resolveWebviewView(
     webviewView: vscode.WebviewView,
     context: vscode.WebviewViewResolveContext,
-    token: vscode.CancellationToken
+    token: vscode.CancellationToken,
   ): void | Thenable<void> {
     /**
      * 保存当前视图的引用
@@ -127,12 +127,35 @@ export class DetailWebviewViewProvider implements vscode.WebviewViewProvider {
 
   private getInitialHtmlContent(): string {
     // 返回初始的 HTML 内容
-    return `暂无详情展示`;
+    // 获取当前打开的工作区文件夹（如果有的话）  
+    let title = "";
+    const workspaceFolder = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0] : null;
+    // 如果有工作区文件夹，更新视图的标题  
+    if (workspaceFolder) {
+      title = `当前项目：${workspaceFolder.name}`;
+      DetailWebviewViewProvider.title = title;
+    }
+
+
+    return title;
   }
-  /**
+  /** 
    * 定义一个静态方法来更新 webview 的内容
    */
   public static async refreshWebview(newBodyContent: string) {
+    // 监听工作区文件夹的变化事件  
+    vscode.workspace.onDidChangeWorkspaceFolders((event) => {
+      console.log('eeeeeee', event)
+      if (event.added.length > 0) {
+        // 如果有新的工作区文件夹被添加  
+        // title = `当前项目：${event.added[0].name}`;
+        DetailWebviewViewProvider.title = `当前项目：${event.added[0].name}`;
+      } else if (event.removed.length > 0) {
+        // 如果没有工作区文件夹了，可以重置为初始标题或其他逻辑  
+        // title = '当前项目：No Workspace Opened';
+        DetailWebviewViewProvider.title = '当前项目：No Workspace Opened';
+      }
+    });
     if (DetailWebviewViewProvider.currentView) {
       /**
        * 直接更新 webview 的 HTML
@@ -175,6 +198,7 @@ export class DetailWebviewViewProvider implements vscode.WebviewViewProvider {
           }
         </style>
     </head>  
+    ${DetailWebviewViewProvider.title}
     ${newBodyContent}
     </html>`;
       DetailWebviewViewProvider.currentView.webview.html = newHtmlContent;
