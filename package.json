@@ -3,8 +3,10 @@
   "displayName": "vscode-extension-blueorigin-guardian",
   "description": "蓝源卫士 vscode 插件",
   "version": "0.0.1",
+  "icon": "resources/logo.png",
+  "publisher": "blueorigin",
   "engines": {
-    "vscode": "^1.57.0"
+    "vscode": "^1.87.0"
   },
   "categories": [
     "Other"
@@ -32,6 +34,15 @@
         "icon": {
           "light": "resources/refresh_black.svg",
           "dark": "resources/refresh_white.svg"
+        }
+      }, 
+      {
+        "command": "vscode-extension-blueorigin-guardian.searchProjectStatus",
+        "title": "查询项目状态",
+        "category": "blueorigin",
+        "icon": {
+          "light": "resources/Status_black.svg",
+          "dark": "resources/Status_white.svg"
         }
       }
     ],
@@ -78,6 +89,11 @@
           "command": "vscode-extension-blueorigin-guardian.refresh",
           "group": "navigation",
           "when": "view == blueOrigin_guardian_details"
+        },
+        {
+          "command": "vscode-extension-blueorigin-guardian.searchProjectStatus",
+          "group": "navigation",
+          "when": "view == blueOrigin_guardian_details"
         }
       ],
       "editor/context": [
@@ -106,10 +122,15 @@
       "title": "蓝源卫士",
       "type": "object",
       "properties": {
-        "blueOriginGuardian.enable": {
-          "type": "boolean",
-          "default": true,
-          "description": "是否启用蓝源卫士",
+        "blueOriginGuardian.scope": {
+          "type": "string",
+          "enum": [
+            "both",
+            "foss",
+            "custom"
+          ],
+          "default": "foss",
+          "description": "蓝源卫士扫描范围可选值：both(开源库与私有库联合)、foss(开源库)、custom(私有库)。默认值为 foss",
           "scope": "application"
         },
         "blueOriginGuardian.serverAddr": {
@@ -131,17 +152,6 @@
           "default": "adminblue",
           "description": "蓝源卫士服务器密码",
           "scope": "application"
-        },
-        "blueOriginGuardian.scope": {
-          "type": "string",
-          "enum": [
-            "both",
-            "foss",
-            "custom"
-          ],
-          "default": "foss",
-          "description": "蓝源卫士扫描范围可选值：both(开源库与私有库联合)、foss(开源库)、custom(私有库)。默认值为 foss",
-          "scope": "application"
         }
       }
     }
@@ -152,7 +162,8 @@
     "watch": "tsc -watch -p ./",
     "pretest": "pnpm run compile && pnpm run lint",
     "lint": "eslint src --ext ts",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "build": "rm -r ./node_modules && npm install && npx vsce package"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.0",

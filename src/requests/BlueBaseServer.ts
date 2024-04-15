@@ -17,6 +17,7 @@ const reqBlue = new class {
   private token: string = "";
   private readonly baseServer = axios.create({
     baseURL: this.baseUrl,
+    // timeout: 8000, // 延时可能会影响项目上传，不要设置
   });
 
   /**

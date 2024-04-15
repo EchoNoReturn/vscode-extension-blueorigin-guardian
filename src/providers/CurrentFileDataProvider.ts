@@ -17,18 +17,13 @@ export class CurrentFileTreeDataProvider implements vscode.TreeDataProvider<Tree
     partialList: []
   };
   public currentFileLoading: boolean = true;
-  private _VUL_SNIPPET_CVE: any[] = [];
   private rootNode: TreeNode<any> = CurrentFileTreeNode(this.currentFileList);
   constructor() {
-    /**
-     * 初始化文件为空，关闭加载效果
-     */
+    // 初始化文件为空，关闭加载效果
     if (!vscode.window.activeTextEditor) {
       this.currentFileLoading = false;
     }
-    /**
-     *监听关闭所有文件，重新更新树视图
-     */
+    // 监听关闭所有文件，重新更新树视图
     vscode.window.onDidChangeActiveTextEditor(document => {
       if (!document) {
         this.rootNode = CurrentFileTreeNode(this.currentFileList);
@@ -50,14 +45,11 @@ export class CurrentFileTreeDataProvider implements vscode.TreeDataProvider<Tree
       return [{ label: "正在加载...", collapsibleState: 0, children: [] }];
     }
     return element ? element.children : this.rootNode.children;
-
   }
 
   refresh(): void {
-
     this.rootNode = CurrentFileTreeNode(this.currentFileList);
     this._onDidChangeTreeData.fire();
-
   }
 
   /**

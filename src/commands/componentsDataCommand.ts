@@ -25,7 +25,7 @@ export const componentsDataCommand = (context: vscode.ExtensionContext) => {
       <div class="center">组件清单文件</div>
       <div class="filesDiv"> ${listEmpty(node.proj_manifest)}</div>
       <div class="center">组件漏洞</div>
-       <div class="cveDiv" > ${listEmpty(node.cve)} </div>
+      <div class="cveDiv" > ${listEmpty(node.cve)} </div>
       </body> `;
     } else {
       /**
