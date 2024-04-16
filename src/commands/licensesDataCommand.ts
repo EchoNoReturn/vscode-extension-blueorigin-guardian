@@ -19,11 +19,12 @@ export const licensesDataCommand = (context: vscode.ExtensionContext) => {
     /**
      *  从本地json文件重获取到相应的许可证
      */
+    console.log('node', node)
     const license = license_zh_cn.slice(0);
     const lis = [];
     for (let i = 0; i < license.length; i += 1) {
 
-      if (license[i].name === node.label) {
+      if (license[i].name.replace(/'/g, '"') === node.label) {
         lis.push({
           name: license[i].name,
           type: license[i].Severity,
@@ -35,7 +36,7 @@ export const licensesDataCommand = (context: vscode.ExtensionContext) => {
 
     const newBodyContent = `<div>许可证名称：${node.label}</div>
       <div>合规性：${compliance(node.compliance)}</div>
-    <div>参考地址：<a href=${lis[0].info}> ${lis[0].info} </a></div >`;
+    <div>参考地址：${!lis.length || node.label === "Other" ? '暂无参考地址' : `<a href=${lis[0].info}> ${lis[0].info} </a>`}</div >`;
     if (webviewPanel) {
       webviewPanel.dispose();
     }
@@ -66,7 +67,7 @@ export const licensesDataCommand = (context: vscode.ExtensionContext) => {
   }
 </style>
 <body>
-  ${node.label === "Other" ? '暂无许可证数据' : lis[0].info2}
+  ${(!lis.length || node.label === "Other") ? '暂无许可证数据' : lis[0].info2}
 </body>
     </html>`;
 

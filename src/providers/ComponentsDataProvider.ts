@@ -27,7 +27,6 @@ export class CreateAllComponentsTreeviewDataProvider implements vscode.TreeDataP
    * 设置加载效果
    */
   public componentsLoading: boolean = false;
-  private _VUL_SNIPPET_CVE: any[] = [];
   private rootNode: TreeNode<any> = createAllComponentsTreeNode(this.componentsList);
   constructor() {
     this.postdata().finally(() => {
@@ -37,9 +36,9 @@ export class CreateAllComponentsTreeviewDataProvider implements vscode.TreeDataP
   }
 
   updateUI(): void {
-    // Object.keys(this.componentsList).forEach(key => {
-    //   this.componentsList[key as keyof CompClass] = [];
-    // });
+    Object.keys(this.componentsList).forEach(key => {
+      this.componentsList[key as keyof CompClass] = [];
+    });
 
     this.postdata().finally(() => {
       this.componentsLoading = false;
@@ -91,7 +90,6 @@ export class CreateAllComponentsTreeviewDataProvider implements vscode.TreeDataP
     if (res.status === 200) {
       const data = this.handleData(res.data);
       this.componentsList = data;
-
     } else {
       console.error(res.data);
       vscode.window.showErrorMessage("蓝源卫士：获取所有组件数据异常");

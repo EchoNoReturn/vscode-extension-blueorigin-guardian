@@ -89,7 +89,7 @@ export function createAllComponentsTreeNode(comp: CompClass) {
     }
     ]
   }];
-  return new TreeNode<any>('所有组件', vscode.TreeItemCollapsibleState.Collapsed, undefined, baseOnTwoTree);
+  return new TreeNode<any>('所有组件', vscode.TreeItemCollapsibleState.Expanded, undefined, baseOnTwoTree);
 }
 
 /**
@@ -106,7 +106,7 @@ export function createAllLicensesTreeNode(licenses: LicensesResponse) {
     { label: `部分合规(${licenses.partialLicenses.length})`, collapsibleState: !licenses.partialLicenses.length ? 0 : 1, children: licenses.partialLicenses },
     { label: `未定义(${licenses.undefinedLicenses.length})`, collapsibleState: !licenses.undefinedLicenses.length ? 0 : 1, children: licenses.undefinedLicenses },
   ];
-  return new TreeNode<any>('所有组件', vscode.TreeItemCollapsibleState.Expanded, undefined, baseOnTwoTree);
+  return new TreeNode<any>('所有许可证', vscode.TreeItemCollapsibleState.Expanded, undefined, baseOnTwoTree);
 }
 /**
  * 创建当前文件视图的所有树节点

@@ -25,7 +25,7 @@ export const currentFileDataCommand = (context: vscode.ExtensionContext) => {
       <div>下载：<a href=${node.download_link}>${node.download_link}</a></div>
       <div class="center">漏洞列表</div>
       <div class="cveDiv">${listEmpty(node.cve)}</div>`;
-    
+
     DetailWebviewViewProvider.refreshWebview(newBodyContent);
     vscode.commands.executeCommand('blueOrigin_guardian_details.focus');
   });

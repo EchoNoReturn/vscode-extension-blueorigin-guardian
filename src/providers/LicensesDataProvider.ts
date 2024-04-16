@@ -5,7 +5,7 @@ import { LicensesResponse, LicensesItem } from '../types/licenses';
 import { TreeNodeUnionType } from '../types';
 import { getWorkSpaceFolder } from '../commands/scanner';
 export class createAllLicensesTreeviewDataProvider implements vscode.TreeDataProvider<TreeNode<any>> {
-  static componentsList(arg0: string, componentsList: any) {
+  static licensesList(arg0: string, componentsList: any) {
     throw new Error('Method not implemented.');
   }
   private _onDidChangeTreeData: vscode.EventEmitter<TreeNodeUnionType> = new vscode.EventEmitter<TreeNodeUnionType>();
@@ -18,7 +18,6 @@ export class createAllLicensesTreeviewDataProvider implements vscode.TreeDataPro
     undefinedLicenses: []
   };
   public licensesLoading: boolean = false;
-  private _VUL_SNIPPET_CVE: any[] = [];
   private rootNode: TreeNode<any> = createAllLicensesTreeNode(this.licensesList);
   constructor() {
     this.postdata().finally(() => {
@@ -30,10 +29,9 @@ export class createAllLicensesTreeviewDataProvider implements vscode.TreeDataPro
    * 更新
    */
   updateUI(): void {
-    // TODO 更新数据并重新加载视图
-    // Object.keys(this.licensesList).forEach(key => {
-    //   this.licensesList[key as keyof LicensesResponse] = [];
-    // });
+    Object.keys(this.licensesList).forEach(key => {
+      this.licensesList[key as keyof LicensesResponse] = [];
+    });
 
     this.postdata().finally(() => {
       this.licensesLoading = false;
