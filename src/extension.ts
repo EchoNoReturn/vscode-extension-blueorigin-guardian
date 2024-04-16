@@ -5,7 +5,7 @@ import { componentsDataCommand } from './commands/componentsDataCommand';
 import { licensesDataCommand } from './commands/licensesDataCommand';
 
 // 假设的对象类型  
-import { reScan, runScanner } from './commands/scanner';
+import { getWorkSpaceFolder, reScan, runScanner } from './commands/scanner';
 import { checkProjectStatus, pollingProjectStatus } from './task/pollingTask';
 import { DetailWebviewViewProvider } from './providers/DetailsWebviewViewProvider';
 
@@ -27,17 +27,49 @@ export function activate(context: vscode.ExtensionContext) {
 	viewManager.init();
 
 	const updateCurrentFileView = (editor: vscode.TextEditor | undefined) => {
-		if (!editor) { return; }
+		if (!editor) {
+			/**
+		 * 刷新webviewhtml
+		 */
+			DetailWebviewViewProvider.refreshWebview('');
+			/**
+			 * 刷新数据
+			 */
+			vscode.commands.executeCommand('vscode-extension-blueorigin-guardian.refresh');
+			return;
+		}
 		viewManager.updateCurrentFileView(editor);
 	};
 	updateCurrentFileView(vscode.window.activeTextEditor);
-
+	/**
+	 * 存储上一个文件夹名
+	 */
+	let filename: string | undefined = getWorkSpaceFolder()?.name ?? vscode.workspace.workspaceFolders?.[0].name;
 	/**
 	 * 切换文件更新当前文件情况
 	 */
 	vscode.window.onDidChangeActiveTextEditor(document => {
-		if (!document) { return; }
+		console.log('document', document)
+		if (!document) {
+			return;
+		}
 		updateCurrentFileView(vscode.window.activeTextEditor);
+		/**
+		 * 判断是否切换了文件，切换了则需要更新数据
+		 */
+		console.log('getWorkSpaceFolder()?.name', getWorkSpaceFolder()?.name)
+		console.log('istrue', filename !== getWorkSpaceFolder()?.name ?? vscode.workspace.workspaceFolders?.[0].name)
+		if (filename !== getWorkSpaceFolder()?.name ?? vscode.workspace.workspaceFolders?.[0].name) {
+			/**
+			 * 刷新webviewhtml
+			 */
+			DetailWebviewViewProvider.refreshWebview('');
+			/**
+			 * 刷新数据
+			 */
+			vscode.commands.executeCommand('vscode-extension-blueorigin-guardian.refresh');
+		}
+		filename = getWorkSpaceFolder()?.name ?? vscode.workspace.workspaceFolders?.[0].name;
 
 	});
 	context.subscriptions.push(

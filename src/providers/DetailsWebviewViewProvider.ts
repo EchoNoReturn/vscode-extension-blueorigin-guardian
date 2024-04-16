@@ -27,7 +27,6 @@ export type MessageType = {
 
 export class DetailWebviewViewProvider implements vscode.WebviewViewProvider {
   public static currentView: vscode.WebviewView | undefined;
-  public static title: string | undefined;
   public resolveWebviewView(
     webviewView: vscode.WebviewView,
     context: vscode.WebviewViewResolveContext,
@@ -50,7 +49,6 @@ export class DetailWebviewViewProvider implements vscode.WebviewViewProvider {
         if (!message.filePath) {
           return;
         }
-        console.log('openFile', message.payloadStr);
         const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
         const basePath = getWorkSpaceFolder()?.uri.path ?? workspaceFolder?.uri.path;
         if (!basePath) {
@@ -127,82 +125,73 @@ export class DetailWebviewViewProvider implements vscode.WebviewViewProvider {
     }
   }
 
-  private getInitialHtmlContent(): string {
+  public getInitialHtmlContent(): string {
     // 返回初始的 HTML 内容
     // 获取当前打开的工作区文件夹（如果有的话）  
-    let title = "";
-    const workspaceFolder = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0] : null;
-    // 如果有工作区文件夹，更新视图的标题  
-    if (workspaceFolder) {
-      title = `当前项目：${workspaceFolder.name}`;
-      DetailWebviewViewProvider.title = title;
-    }
-
-
-    return title;
+    const workspaceFolder = getWorkSpaceFolder()?.name ?? vscode.workspace.workspaceFolders?.[0].name;
+    return `当前项目：${workspaceFolder}` as string;
   }
   /** 
    * 定义一个静态方法来更新 webview 的内容
    */
   public static async refreshWebview(newBodyContent: string) {
-    // 监听工作区文件夹的变化事件  
-    vscode.workspace.onDidChangeWorkspaceFolders((event) => {
-      console.log('eeeeeee', event)
-      if (event.added.length > 0) {
-        // 如果有新的工作区文件夹被添加  
-        // title = `当前项目：${event.added[0].name}`;
-        DetailWebviewViewProvider.title = `当前项目：${event.added[0].name}`;
-      } else if (event.removed.length > 0) {
-        // 如果没有工作区文件夹了，可以重置为初始标题或其他逻辑  
-        // title = '当前项目：No Workspace Opened';
-        DetailWebviewViewProvider.title = '当前项目：No Workspace Opened';
-      }
-    });
     if (DetailWebviewViewProvider.currentView) {
       /**
        * 直接更新 webview 的 HTML
        */
-      const newHtmlContent = `<!DOCTYPE html>  
-    <html lang="en">  
-    <head>  
-        <meta charset="UTF-8">  
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-        <title>view</title> 
-        <style>
-            /* 这里添加 CSS 代码 */
-          .filesDiv,.cveDiv{
-            height: 100px;
-            overflow-y: auto;
-            border:1px solid #fff;
-            padding-left:5px;
-            margin-top:5px;
-          }
-          .center{
-            text-align: center;
-          }
-          .green{
-            color:green;
-          }
-          .yellow{
-            color:#ffeb3b;
-          }
-          .orange{
-            color: orange;
-          }
-          .red{
-            color:red;
-          }
-          .grey{
-            color:grey;
-          }
-          div{
-            padding:2px 0;
-          }
-        </style>
-    </head>  
-    ${DetailWebviewViewProvider.title}
-    ${newBodyContent}
-    </html>`;
+      const newHtmlContent = `<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>view </title>
+  <style>
+    /* 这里添加 CSS 代码 */
+    .filesDiv,
+    .cveDiv {
+      height: 100px;
+      overflow-y: auto;
+      border: 1px solid #fff;
+      padding-left: 5px;
+      margin-top: 5px;
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    .green {
+      color: green;
+    }
+
+    .yellow {
+      color: #ffeb3b;
+    }
+
+    .orange {
+      color: orange;
+    }
+
+    .red {
+      color: red;
+    }
+
+    .grey {
+      color: grey;
+    }
+
+    div {
+      padding: 2px 0;
+    }
+  </style>
+</head>
+
+<body>
+  ${`<div>当前文件：${getWorkSpaceFolder()?.name ?? vscode.workspace.workspaceFolders?.[0].name}</div>`}
+  ${newBodyContent}
+</body>
+</html>`;
       DetailWebviewViewProvider.currentView.webview.html = newHtmlContent;
     } else {
       // 如果当前没有 webview 视图，你可以根据需要处理这种情况，例如显示错误消息

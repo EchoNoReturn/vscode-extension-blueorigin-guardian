@@ -31,7 +31,6 @@ export const componentsDataCommand = (context: vscode.ExtensionContext) => {
       /**
        * 片段代码组件
        */
-      console.log('node', node)
       newBodyContent = `<body>  
       <div>片段代码组件：(Snippet Code Component)</div>
       <div>组件名称：${node.label}</div>

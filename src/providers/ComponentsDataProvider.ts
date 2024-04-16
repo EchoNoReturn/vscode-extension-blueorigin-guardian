@@ -87,13 +87,10 @@ export class CreateAllComponentsTreeviewDataProvider implements vscode.TreeDataP
      */
     this.componentsLoading = true;
     this.refresh();
-    console.log('proj', proj)
     const res = await reqBlue.postData('/local2/getcomponentview', { proj });
     if (res.status === 200) {
-      console.log('res', res)
       const data = this.handleData(res.data);
       this.componentsList = data;
-      console.log('data', data)
 
     } else {
       console.error(res.data);

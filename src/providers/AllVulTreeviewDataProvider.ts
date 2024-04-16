@@ -39,7 +39,7 @@ export class AllVulnerabilitiesTreeviewDataProvider implements MyTreeDataProvide
 
   constructor() {
     vscode.commands.registerCommand('blue.clickAllVulTreeItem', this.handleTreeItemClick, this);
-    this.postdataAndUpdateUI().finally(() => { 
+    this.postdataAndUpdateUI().finally(() => {
       this.refresh();
     });
   }
@@ -65,7 +65,6 @@ export class AllVulnerabilitiesTreeviewDataProvider implements MyTreeDataProvide
    * @param element TreeNode<CveInfo | VulData>
    */
   handleTreeItemClick(element: TreeNode<CveInfo | VulData>) {
-    console.log('handleTreeItemClick', element);
     let newHtmlContent = '';
     const data = element.payloadData;
     if (data instanceof CveInfo) {
@@ -129,14 +128,13 @@ export class AllVulnerabilitiesTreeviewDataProvider implements MyTreeDataProvide
       this.refresh();
       vscode.window.showErrorMessage("蓝源卫士：获取漏洞数据异常");
     }
-    
+
   }
 
   /**
    * 处理相应结果
    */
   handleData(data: CveViewResponse) {
-    console.log('data', data);
     Object.keys(data).forEach((key) => {
       const newKey = key as keyof CveViewResponse;
       // 对 vul 数据特殊处理
