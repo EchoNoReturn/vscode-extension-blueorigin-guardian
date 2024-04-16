@@ -137,20 +137,20 @@
           "type": "string",
           "default": "http://192.168.0.37:8081",
           "format": "url",
-          "description": "蓝源卫士服务器地址",
+          "description": "蓝源卫士服务地址",
           "scope": "application"
         },
         "blueOriginGuardian.login": {
           "type": "string",
           "default": "admin@localhost.com",
-          "description": "蓝源卫士服务账户",
+          "description": "蓝源卫士账户",
           "scope": "application"
         },
         "blueOriginGuardian.password": {
           "type": "string",
           "format": "password",
           "default": "adminblue",
-          "description": "蓝源卫士服务器密码",
+          "description": "蓝源卫士密码",
           "scope": "application"
         }
       }
