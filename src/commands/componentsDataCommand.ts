@@ -3,6 +3,7 @@ import { listEmpty } from '../utils/detailsWebview';
 import { DetailWebviewViewProvider } from '../providers/DetailsWebviewViewProvider';
 import { CompItem, PkgdepItem } from '../types/compviews';
 import { compliance } from '../utils/index';
+import { Cve, CveSeverity } from '../shared';
 
 /**
  * 点击子目录命令
@@ -14,6 +15,7 @@ export const componentsDataCommand = (context: vscode.ExtensionContext) => {
      * 这里实现你的点击命令逻辑
      * 传送的数据是所有组件
      */
+    console.log('node', node)
     let newBodyContent = ``;
     if (typeof node.license !== 'string') {
       /**
@@ -31,6 +33,16 @@ export const componentsDataCommand = (context: vscode.ExtensionContext) => {
       /**
        * 片段代码组件
        */
+      function isEmptyObject(obj: { constructor?: any; }) {
+        return obj && Object.keys(obj).length === 0 && obj.constructor === Object;
+      }
+      const ObjectCve = (cve: { [s: string]: unknown; } | ArrayLike<unknown>) => {
+        const cveList: string[] = [];
+        Object.entries(cve).map(([key, value]) => (
+          cveList.push(`<div key= {key} >${key} (${Cve.parseSeverityString(value as CveSeverity)})</div>`)
+        ));
+        return cveList;
+      };
       newBodyContent = `<body>  
       <div>片段代码组件：(Snippet Code Component)</div>
       <div>组件名称：${node.label}</div>
@@ -42,7 +54,7 @@ export const componentsDataCommand = (context: vscode.ExtensionContext) => {
       <div class="center">涉及版本</div>
       <div class="filesDiv">${listEmpty(node.versions.split(','))}</div>
       <div class="center">漏洞列表</div>
-      <div class="cveDiv"> ${listEmpty(node.cve)}</div>
+      <div class="cveDiv"> ${isEmptyObject(node.cve) ? '<div class="center">暂无数据</div>' : ObjectCve(node.cve)}</div>
       <div class="center">影响文件列表</div>
       <div class="filesDiv">${listEmpty(node.proj_files)}</div>
       </body> `;
